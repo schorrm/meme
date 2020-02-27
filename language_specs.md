@@ -21,7 +21,9 @@ For example, the following meme:
 Is properly encoded as:
 
 ```meme
-/M:drake;FF:Helvetica/T<r1>:WYSIWYG/T<r2>:Handwritten Markup/
+/M:drake;FF:Helvetica/T:WYSIWYG:r1/T:Handwritten Markup:r2/
 ```
 
 Where the termination of the M block is emplied by the end of the encoding.
+
+Each block has a base tag (either a style tag to modify the style or a scoping type such as C, M, or T). Colons (:) chain together arguments in `TAG:required:optional` order, and then `;` ends tag arguments. So ```/T:WYSIWYG:r1;F:impact:20pt/``` denotes a Text block (T), WYSIWYG being the text (mandatory), followed by font styling of impact, 20pt.
