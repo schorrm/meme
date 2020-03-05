@@ -21,7 +21,7 @@ For example, the following meme:
 Is properly encoded as:
 
 ```meme
-/M:drake;FF:Helvetica/T:WYSIWYG:r1/T:Handwritten Markup:r2/
+/M:drake;FF:Helvetica/T:WYSIWYG:r1/T:Handwritten_Markup:r2/
 ```
 
 Where the termination of the M block is emplied by the end of the encoding.
