@@ -28,15 +28,44 @@ class FormatManager:
         @property
         def current_font(self):
             return self.fonts[-1]
-            
+
         def F_tag(self, font_face, font_size, outline_size):
             self.fonts.append(self.current_font.inherit(font_face, font_size, outline_size))
 
-        def pop_F(self):
-            if len(self.font) > 1:
-                self.fonts.pop()
+        def AL_tag(self, ...):
+            pass
+
+        def CL_tag(self, ...):
+            pass
+
+        def update_context(self, tag):
+            # TODO: Actually define the tag type and how to access it / pull details out of it.
+            if tag.type == TagTypes.FONT:
+                self.F_tag(**tag.data)
+            elif tag.type == TagTypes.ALIGNMENT:
+                self.AL_tag(**tag.data)
+            elif tag.type == TagTypes.COLOR:
+                self.CL_tag(**tag.data)
             else:
-                raise RuntimeError("Can't pop default font specifier")
+                # TODO: Usefuller error messages. Own error type(s)?
+                raise RuntimeError("Got bad tag type")
+
+        def pop_tag(self, tag):
+            """ Handles a pop tag """
+            # TODO: Better name for thing
+            if tag.data == 'F':
+                thing = self.fonts
+            elif tag.data == 'AL':
+                thing = self.aligns
+            elif tag.data == 'CL':
+                thing = self.colors
+            else:
+                raise RuntimeError("Invalid pop tag data")
+
+            if len(thing) > 1:
+                thing.pop()
+            else:
+                raise RuntimeError("Can't pop default formatting specifier")
         
     @property
     def _current_context(self):
@@ -45,9 +74,11 @@ class FormatManager:
     def __init__(self):
         self.contexts = []
 
-    def push_context(self):
+    def push_context(self, f_tag=None, al_tag=None, cl_tag=None):
         """ Adds a new context (Container or Meme) to the stack """
-        self.contexts.append(FormatManager.FormatContext(self.current_font, self.current_align, self.current_color))
+        self.contexts.append(FormatManager.FormatContext(f_tag or self.current_font,
+                                                         al_tag or self.current_align,
+                                                         cl_tag or self.current_color))
 
     def pop_context(self):
         """ Remove the current context when the Meme/Container ends """
