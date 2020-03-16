@@ -30,6 +30,13 @@ format_block: font
             | fontface
             | fontsize
             | textstyle
+            | colorblock
+            | align
+
+colorblock: "CL" (":" color?) ~ 0..3 
+color: CNAME | "#" HEXNUM
+HEXNUM: (HEXDIGIT ~ 3) ~ 1..2
+align: "AL" (":" COLUMN?)? (":" HEIGHTAL?)?
 
 font: "F" (":" fontname)? (":" fontsizedir)?
 fontface: "FF" (":" fontname)?
@@ -48,6 +55,7 @@ position: named_position | indexed_column
 named_position: "top" | "bottom" | "center"
 indexed_column: COLUMN INT
 COLUMN: "r" | "c" | "l"
+HEIGHTAL: "t" | "c" | "b"
 
 instance: fun arg*
 scoped: ";" instance
@@ -62,6 +70,7 @@ VALID_BLOCK: _TILDE_SOLVE | _ESCAPE_SAFE // Order here is crucial for some reaso
 %import common.CNAME
 %import common.LETTER
 %import common.DIGIT
+%import common.HEXDIGIT
 %import common.SIGNED_NUMBER
 %import common.INT
 %import common.ESCAPED_STRING

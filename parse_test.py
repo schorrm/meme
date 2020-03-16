@@ -6,7 +6,7 @@ import pprint
 
 with open('grammar_enforcing.lark') as f:
     t = f.read()
-l = Lark(t, parser='earley')
+l = Lark(t, parser='lalr')
 
 strings = [
     "/M/",
@@ -30,7 +30,8 @@ strings = [
     "/M:drake;F:Helvetica:20pt/T:WYSIWYG:r1/T:Handwritten Markup:r2/",
     "/M:drake:640x480;F:Helvetica:20pt/T:WYSIWYG:r1/T:Handwritten Markup:r2/",
     "/M:drake:640x480;F:Helvetica:20pt;TS:bui/T:WYSIWYG:r1/T:Handwritten Markup:r2/",
-    "/M:.localmeme.png/T:Local_text_support/",
+    "/M:.localmeme.png/T:Local_text_support/CL:alicewhite:#fff:#f0f0f0/",
+    "/M:.localmeme.png/T:Local_text_support/CL:alicewhite::#f0f0f0/",
 ]
 
 for s in strings:
