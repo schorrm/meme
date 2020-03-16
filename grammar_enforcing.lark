@@ -7,19 +7,24 @@ block: (layout_block | format_block) (";" format_block)* "/"
 layout_block: (textblock
             | memeblock
             | compositeblock
-            | whitespaceprefix)
-
+            | whitespaceprefix
+            | endcomposite)
+            
 textblock: "T" ":" (text) (":" position)? (":" rotation)?
 memeblock: "M" (":" imagehandle)? (":" size)? (":" gridposition)?
 compositeblock: "C" (":" gridsize)? (":" gridposition)?
 whitespaceprefix: "WP:" text
+endcomposite: "END" // Perhaps: END: PARAM
 
 size: SIZEDIR "x" SIZEDIR
 gridsize: INT "x" INT
 gridposition: INT "," INT
 
 text: VALID_BLOCK
-imagehandle: CNAME
+imagehandle: local_image | library_image
+library_image: IMGH
+local_image: "." IMGH
+IMGH: ("-" | "_" | LETTER | DIGIT) ("-" | "_" | LETTER | DIGIT | ".")*
 
 format_block: font
             | fontface
@@ -55,6 +60,8 @@ VALID_BLOCK: _TILDE_SOLVE | _ESCAPE_SAFE // Order here is crucial for some reaso
 // _TILDE_SOLVE:  /(~~)+?(?=[\/:])/
 
 %import common.CNAME
+%import common.LETTER
+%import common.DIGIT
 %import common.SIGNED_NUMBER
 %import common.INT
 %import common.ESCAPED_STRING

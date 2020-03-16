@@ -30,6 +30,7 @@ strings = [
     "/M:drake;F:Helvetica:20pt/T:WYSIWYG:r1/T:Handwritten Markup:r2/",
     "/M:drake:640x480;F:Helvetica:20pt/T:WYSIWYG:r1/T:Handwritten Markup:r2/",
     "/M:drake:640x480;F:Helvetica:20pt;TS:bui/T:WYSIWYG:r1/T:Handwritten Markup:r2/",
+    "/M:.localmeme.png/T:Local_text_support/",
 ]
 
 for s in strings:
