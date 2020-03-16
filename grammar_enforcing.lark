@@ -33,9 +33,10 @@ format_block: font
             | colorblock
             | align
 
-colorblock: "CL" (":" color?) ~ 0..3 
-color: CNAME | "#" HEXNUM
-HEXNUM: (HEXDIGIT ~ 3) ~ 1..2
+colorblock: "CL" (colorarg) ~ 0..3
+colorarg: ":" color?
+color: CNAME | HEXCOLOR
+HEXCOLOR: "#" (HEXDIGIT ~ 3) ~ 1..2
 align: "AL" (":" COLUMN?)? (":" HEIGHTAL?)?
 
 font: "F" (":" fontname)? (":" fontsizedir)?
