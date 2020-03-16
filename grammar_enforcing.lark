@@ -1,0 +1,60 @@
+// Grammar for parsing.
+// Variant where grammar handles language checks
+
+start: "/" block+
+block: (layout_block | format_block) (";" format_block)* "/"
+
+layout_block: (textblock
+            | memeblock
+            | compositeblock
+            | whitespaceprefix)
+
+textblock: "T" ":" (text) (":" position)? (":" rotation)?
+memeblock: "M" (":" imagehandle)? (":" size)? (":" gridposition)?
+compositeblock: "C" (":" gridsize)? (":" gridposition)?
+whitespaceprefix: "WP:" text
+
+size: SIZEDIR "x" SIZEDIR
+gridsize: INT "x" INT
+gridposition: INT "," INT
+
+text: VALID_BLOCK
+imagehandle: CNAME
+
+format_block: font
+            | fontface
+            | fontsize
+            | textstyle
+
+font: "F" (":" fontname)? (":" fontsizedir)?
+fontface: "FF" (":" fontname)?
+fontsize: "FS" (":" fontsizedir)
+
+fontname: CNAME
+!fontsizedir: INT ("pt" | "px" | "em")
+SIZEDIR: INT ("%" | "px")?
+
+textstyle: "TS" (":" TEXSTYLEDIR*)?
+TEXSTYLEDIR: "b" | "u" | "s" | "i"
+
+rotation: SIGNED_NUMBER
+position: named_position | indexed_column
+
+named_position: "top" | "bottom" | "center"
+indexed_column: COLUMN INT
+COLUMN: "r" | "c" | "l"
+
+instance: fun arg*
+scoped: ";" instance
+fun: VALID_BLOCK
+arg: ":" VALID_BLOCK
+
+_TILDE_SOLVE.2: /((~~)+)(?=[\/:;])/
+_ESCAPE_SAFE: /(.+?)(?<!~)(~~)*?(?=[\/:;])/ // 
+VALID_BLOCK: _TILDE_SOLVE | _ESCAPE_SAFE // Order here is crucial for some reason
+// _TILDE_SOLVE:  /(~~)+?(?=[\/:])/
+
+%import common.CNAME
+%import common.SIGNED_NUMBER
+%import common.INT
+%import common.ESCAPED_STRING

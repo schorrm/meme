@@ -9,8 +9,8 @@ fun: VALID_BLOCK
 arg: ":" VALID_BLOCK
 
 _TILDE_SOLVE.2: /((~~)+)(?=[\/:;])/
-_ESCAPE_SAFE: /(.+?)(?<!~)(~~)*?(?=[\/:;])/
-VALID_BLOCK: _TILDE_SOLVE | _ESCAPE_SAFE // Order here is crucial!
+_ESCAPE_SAFE: /(.+?)(?<!~)(~~)*?(?=[\/:;])/ // 
+VALID_BLOCK: _TILDE_SOLVE | _ESCAPE_SAFE // Order here is crucial for some reason
 // _TILDE_SOLVE:  /(~~)+?(?=[\/:])/
 
 %import common.CNAME
