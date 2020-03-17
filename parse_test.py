@@ -36,7 +36,7 @@ strings = [
     "/M:.localmeme.png/T:Local_text_support/CL:alicewhite::#f0f0f0/",
     "/M/AL::b/AL:c:c/",
     "/M:doge:640x420::1,3;F:Helvetica:20/AL::b/F::22/AL:c:c/T:SomeTextHere/AL:c/AL::c/CL:aliceblue:#fff:#000/CL:::tomato/",
-    "/WP:MFW_when/M:doge/T:SomeoneIsDoging/",
+    "/WP:MFW_when/M:doge;F:arial:12/T:SomeoneIsDoging:bottom/",
 ]
 
 transformer = ConvertParseTree()
@@ -48,4 +48,5 @@ for s in strings:
 
 pprint.pprint(l.parse(s))
 
+print(s)
 pprint.pprint(transformer.transform(l.parse(s)))

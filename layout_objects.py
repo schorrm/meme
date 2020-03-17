@@ -1,8 +1,8 @@
 #!/usr/bin/python3
-
 '''
 Class for intermediate layout objects
 '''
+from utils import *
 
 class Meme:
     def __init__(self, image: str = None, size=None, fillcolor='white'):

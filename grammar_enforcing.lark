@@ -2,9 +2,9 @@
 // Variant where grammar handles language checks
 
 start: "/" block+
-block: (layout_block | format_block) (";" format_block)* "/"
+block: (_layout_block | _format_block) (";" _format_block)* "/"
 
-layout_block: (textblock
+_layout_block: (textblock
             | memeblock
             | compositeblock
             | whitespaceprefix
@@ -28,7 +28,7 @@ library_image: IMGH
 local_image: "." IMGH // TODO: maybe change this to some character that breaks URIs, like ^? 
 IMGH: ("-" | "_" | LETTER | DIGIT | ".")+
 
-format_block: font
+_format_block: font
             | textstyle
             | colorblock
             | align
@@ -41,8 +41,8 @@ align: "AL" (halign valign?)?
 
 halign: ":" COLUMN?
 valign: ":" HEIGHTAL
-COLUMN: "r" | "c" | "l" | "right" | "center" | "left"
-HEIGHTAL: "t" | "c" | "b" | "top" | "center" | "bottom"
+COLUMN: "right" | "center" | "left" | "r" | "c" | "l" 
+HEIGHTAL:  "top" | "center" | "bottom" | "t" | "c" | "b"
 
 font: "F" (fontname (":" FONTSIZE)? (":" OUTLINESIZE)?)?
 
@@ -55,10 +55,10 @@ textstyle: "TS" (":" TEXSTYLEDIR*)?
 TEXSTYLEDIR: "b" | "u" | "s" | "i"
 
 rotation: SIGNED_NUMBER
-position: named_position | indexed_column
+position: HEIGHTAL | INDEXCOL
 
 named_position: "top" | "bottom" | "center"
-indexed_column: COLUMN INT
+INDEXCOL: COLUMN INT
 
 instance: fun arg*
 scoped: ";" instance

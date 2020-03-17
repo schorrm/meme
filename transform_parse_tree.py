@@ -26,13 +26,16 @@ class ConvertParseTree(Transformer):
         return tree
 
     def block(self, subtree):
-        return {'blocks': subtree}
+        return subtree
 
     def format_block(self, subtree):
         return {
             'blocktype': 'format',
             'data': subtree[0]
         }
+
+    def named_position(self, position):
+        return _extract_monic(position)
 
     def layout_block(self, subtree):
         return {
@@ -107,6 +110,5 @@ class ConvertParseTree(Transformer):
     def textblock(self, tree):
         return Text(**list2dict(tree))
 
-
     def whitespaceprefix(self, text):
-        return WhitespacePrefix(text=text)
+        return WhitespacePrefix(**text[0])
