@@ -46,8 +46,3 @@ for s in strings:
     # print(l.parse(s).pretty())
     pprint.pprint(transformer.transform(l.parse(s)))
     print()
-
-pprint.pprint(l.parse(s))
-
-print(s)
-pprint.pprint(transformer.transform(l.parse(s)))

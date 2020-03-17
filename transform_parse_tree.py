@@ -85,6 +85,9 @@ class ConvertParseTree(Transformer):
     def text(self, token):
         return {'text': _extract_monic(token)}
 
+    def endcomposite(self, token):
+        return Pop(Composite)
+
     def position(self, position):
         return {'position': _extract_monic(position)}
 
