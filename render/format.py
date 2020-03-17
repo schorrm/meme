@@ -1,5 +1,6 @@
 from render.format_types import Font, Alignment, Color
 
+
 class FormatManager:
     class FormatContext:
         def __init__(self, def_font=Font(), def_align=None, def_color=None):
@@ -48,11 +49,11 @@ class FormatManager:
                 thing.pop()
             else:
                 raise RuntimeError("Can't pop default formatting specifier")
-        
+
     @property
     def _current_context(self):
         return self.contexts[-1]
-    
+
     def __init__(self):
         self.contexts = []
 
@@ -78,6 +79,7 @@ class FormatManager:
     def current_align(self):
         """ Get current alignment """
         return self._current_context.current_align
+
     @property
     def current_color(self):
         """ Get current colors """

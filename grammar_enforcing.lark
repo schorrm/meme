@@ -11,40 +11,44 @@ layout_block: (textblock
             | endcomposite)
             
 textblock: "T" ":" (text) (":" position)? (":" rotation)?
-memeblock: "M" (":" imagehandle)? (":" size)? (":" gridposition)?
+memeblock: "M" ((":" imagehandle?) (":" size?)? (":" fillcolor?)? (":" gridposition?)?)? //(":" gridposition?)?
 compositeblock: "C" (":" gridsize)? (":" gridposition)?
 whitespaceprefix: "WP:" text
 endcomposite: "END" // Perhaps: END: PARAM
 
-size: SIZEDIR "x" SIZEDIR
+fillcolor: COLOR
+size: INT "x" INT
 gridsize: INT "x" INT
 gridposition: INT "," INT
 
 text: VALID_BLOCK
-imagehandle: local_image | library_image
+imagehandle: IMGH
+// local_image | library_image
 library_image: IMGH
-local_image: "." IMGH
-IMGH: ("-" | "_" | LETTER | DIGIT) ("-" | "_" | LETTER | DIGIT | ".")*
+local_image: "." IMGH // TODO: maybe change this to some character that breaks URIs, like ^? 
+IMGH: ("-" | "_" | LETTER | DIGIT | ".")+
 
 format_block: font
-            | fontface
-            | fontsize
             | textstyle
             | colorblock
             | align
 
 colorblock: "CL" (colorarg) ~ 0..3
-colorarg: ":" color?
-color: CNAME | HEXCOLOR
+colorarg: ":" COLOR?
+COLOR: LETTER+ | HEXCOLOR
 HEXCOLOR: "#" (HEXDIGIT ~ 3) ~ 1..2
-align: "AL" (":" COLUMN?)? (":" HEIGHTAL?)?
+align: "AL" (halign valign?)?
 
-font: "F" (":" fontname)? (":" fontsizedir)?
-fontface: "FF" (":" fontname)?
-fontsize: "FS" (":" fontsizedir)
+halign: ":" COLUMN?
+valign: ":" HEIGHTAL
+COLUMN: "r" | "c" | "l" | "right" | "center" | "left"
+HEIGHTAL: "t" | "c" | "b" | "top" | "center" | "bottom"
 
-fontname: CNAME
-!fontsizedir: INT ("pt" | "px" | "em")
+font: "F" (fontname (":" FONTSIZE)? (":" OUTLINESIZE)?)?
+
+fontname:  ":" CNAME?
+OUTLINESIZE: INT
+FONTSIZE: INT // Removed ("pt" | "px" | "em")
 SIZEDIR: INT ("%" | "px")?
 
 textstyle: "TS" (":" TEXSTYLEDIR*)?
@@ -55,8 +59,6 @@ position: named_position | indexed_column
 
 named_position: "top" | "bottom" | "center"
 indexed_column: COLUMN INT
-COLUMN: "r" | "c" | "l"
-HEIGHTAL: "t" | "c" | "b"
 
 instance: fun arg*
 scoped: ";" instance
