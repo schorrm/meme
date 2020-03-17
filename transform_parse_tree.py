@@ -28,21 +28,6 @@ class ConvertParseTree(Transformer):
     def block(self, subtree):
         return subtree
 
-    def format_block(self, subtree):
-        return {
-            'blocktype': 'format',
-            'data': subtree[0]
-        }
-
-    def named_position(self, position):
-        return _extract_monic(position)
-
-    def layout_block(self, subtree):
-        return {
-            'blocktype': 'layout',
-            'data': subtree[0]
-        }
-
     def fontname(self, fontname):
         if fontname:
             return fontname[0].value
@@ -96,7 +81,7 @@ class ConvertParseTree(Transformer):
         position = tree.get('position')
         if position:
             tree.pop('position')
-        return (position, Meme(**tree))
+        return (Meme(**tree), position)
 
     def text(self, token):
         return {'text': _extract_monic(token)}
