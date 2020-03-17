@@ -51,7 +51,6 @@ class ConvertParseTree(Transformer):
     def align(self, alignments):
         if not alignments:
             return Pop('align')
-        print(alignments)
         halign, valign = unpack(alignments)
         return Alignment(halign, valign)
 
