@@ -2,7 +2,8 @@
 '''
 Class for intermediate layout objects
 '''
-from utils import *
+
+from utils import get_image_size, DEFAULT_SIZE
 
 class Meme:
     def __init__(self, image: str = None, size=None, fillcolor='white'):

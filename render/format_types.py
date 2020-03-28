@@ -1,6 +1,3 @@
-from utils import *
-
-
 class Font:
     def __init__(self, font_face='impact', font_size=14, outline_size=0):
         self.font_face = font_face

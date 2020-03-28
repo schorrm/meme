@@ -4,7 +4,7 @@ import os
 import glob
 
 from typing import Tuple, List
-from enum import Enum, auto
+from enum import Enum, auto, unique
 
 from collections import ChainMap
 
@@ -14,29 +14,35 @@ DEFAULT_SIZE = (640, 480)
 def get_image_size(filename: str) -> Tuple[int, int]:
     pass
 
+@unique
 class TagType(Enum):
-    FORMATTING = auto()  # TODO: enumerate our types
+    # TODO: enumerate our types
+    FONT = auto()
+    ALIGNMENT = auto()
+    COLOR = auto()
     TEXT = auto()
     POP = auto()
 
-# Unpacks a tuple / list of 1 or 2 items to 2, safely
-
+    @property
+    def is_format(self):
+        return self in [TagType.FONT, TagType.ALIGNMENT, TagType.COLOR]
 
 def unpack(l: List, nullvalue=None):
+    """ Unpacks a tuple / list of 1 or 2 items to 2, safely """
     a, b, *_ = l + [nullvalue]
     return (a, b)
 
 
 def unpack3(l: List, nullvalue=None):
-    # Unpacks a tuple / list of 1 or 2 items to 2, safely
-    a, b, c, *d = l + [nullvalue, nullvalue, nullvalue]
+    """ Unpacks a tuple / list of 1 or 2 items to 2, safely """
+    a, b, c, *_ = l + [nullvalue, nullvalue, nullvalue]
     return (a, b, c)
 
 
 def list2dict(l: List[dict]):
     return dict(ChainMap(*l))
 
-    # TODO: come up with some bullshit to make this platform-independent
+# TODO: come up with some bullshit to make this platform-independent
 SML_DIR = '/usr/local/lib/meme/sml'
 LIB_DIR = '/usr/local/lib/meme/lib'
 
@@ -47,7 +53,7 @@ def resolve_file_path(image_handle: str):
         workingdir = LIB_DIR
         image_handle = image_handle[2:]
     elif image_handle.startswith('.'):
-        workingdir = os.curdir()
+        workingdir = os.getcwd()
         image_handle = image_handle[1:]
     else:
         workingdir = SML_DIR

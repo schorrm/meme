@@ -1,4 +1,6 @@
 from render.format_types import Font, Alignment, Color
+import warnings
+from utils import TagType
 
 
 class FormatManager:
@@ -12,23 +14,34 @@ class FormatManager:
         def current_font(self):
             return self.fonts[-1]
 
-        def F_tag(self, font_face, font_size, outline_size):
-            self.fonts.append(self.current_font.inherit(font_face, font_size, outline_size))
+        @property
+        def current_align(self):
+            return self.aligns[-1]
 
-        # def AL_tag(self, ...):
-        #     pass
+        @property
+        def current_color(self):
+            return self.colors[-1]
 
-        # def CL_tag(self, ...):
-        #     pass
+        def F_tag(self, font):
+            self.fonts.append(font.inherit_from(self.current_font))
+
+        def AL_tag(self, align):
+            self.aligns.append(align.inherit_from(self.current_align))
+
+        def CL_tag(self, color):
+            self.colors.append(color.inherit_from(self.current_color))
 
         def update_context(self, tag):
             # TODO: Actually define the tag type and how to access it / pull details out of it.
-            if tag.type == TagTypes.FONT:
-                self.F_tag(**tag.data)
-            elif tag.type == TagTypes.ALIGNMENT:
-                self.AL_tag(**tag.data)
-            elif tag.type == TagTypes.COLOR:
-                self.CL_tag(**tag.data)
+            if tag.type == TagType.FONT:
+                self.F_tag(tag.data)
+            elif tag.type == TagType.ALIGNMENT:
+                self.AL_tag(tag.data)
+            elif tag.type == TagType.COLOR:
+                self.CL_tag(tag.data)
+            elif tag.type == TagType.POP:
+                warnings.warn("Got POP tag in update_context(). pop_tag() should be called explicitly", RuntimeWarning)
+                self.pop_tag(tag)
             else:
                 # TODO: Usefuller error messages. Own error type(s)?
                 raise RuntimeError("Got bad tag type")
@@ -69,21 +82,6 @@ class FormatManager:
 
     def __getattr__(self, attr):
         return getattr(self._current_context, attr)
-
-    @property
-    def current_font(self):
-        """ Get current font """
-        return self._current_context.current_font
-
-    @property
-    def current_align(self):
-        """ Get current alignment """
-        return self._current_context.current_align
-
-    @property
-    def current_color(self):
-        """ Get current colors """
-        return self._current_context.current_color
 
     def scoped_F_tag(self, font_face, font_size, outline_size):
         """ Convenience function for a scoped font tag on a text block, to avoid needing to call push/get/pop """
