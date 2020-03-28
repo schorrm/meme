@@ -8,11 +8,21 @@ from enum import Enum, auto, unique
 
 from collections import ChainMap
 
+from typing import Tuple
+Coordinates = Tuple[int, int]
+BBox = Tuple[int, int, int, int]
+
+## IMAGE UTILS
 
 DEFAULT_SIZE = (640, 480)
 
 def get_image_size(filename: str) -> Tuple[int, int]:
     pass
+
+def get_bbox(smaller: Coordinates, larger: Coordinates) -> BBox:
+    w_delta = (larger[0] - smaller[0])
+    h_delta = (larger[1] - smaller[1])
+    return (w_delta, h_delta, smaller[0]+w_delta, smaller[1]+h_delta)
 
 @unique
 class TagType(Enum):
@@ -59,6 +69,7 @@ def resolve_file_path(image_handle: str):
         workingdir = SML_DIR
 
     segments = image_handle.split('.')
+    # TODO: ignore config files
     no_ex_pattern = os.path.join(workingdir, *segments) + '.*'
     last = segments.pop()
     ex_file = os.path.join(workingdir, *segments) + f'.{last}'
