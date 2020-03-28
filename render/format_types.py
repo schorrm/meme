@@ -34,6 +34,7 @@ class Alignment:
     def __repr__(self):
         return f'<Align {self.halign}, {self.valign}>'
 
+
 class Color:
     def __init__(self, foreground: str = "black", background: str = None, outline: str = "white"):
         self.foreground = foreground
@@ -48,3 +49,5 @@ class Color:
     def __repr__(self):
         return f'<Color: FG={self.foreground}, BG={self.background}, OL={self.outline}>'
 
+
+# TODO: Support text style

@@ -10,11 +10,8 @@ import warnings
 
 from PIL import Image
 
-class DrawingManager:
-    def __init__(self):
-        self.format_manager = FormatManager()
-
-    def InitImage(self, image_handle: str, size: Coordinates, fillcolor: str = '#fff', mode: str = "resize"):
+class Meme:
+    def __init__(self, image_handle: str, size: Coordinates, fillcolor: str = '#fff', mode: str = "resize"):
         ''' Create an Image to start drawing text on. '''
         if not image_handle:
             return Image.new('RGB', size, fillcolor)
@@ -34,19 +31,66 @@ class DrawingManager:
             else:
                 raise RuntimeError("Bad Mode")
 
-        return image
+        self.load_config(file_path)
+        self.max_row = 1
+    
+    def load_config(self, file_path):
+        config_path = file_path + CONFIG_EXT
+        if os.path.exists(config_path):
+            cfg = open(config_path)
+        else:
+            cfg = DEFAULT_TEXT_FIELD_CFG
 
+        # TODO: Implement. something like
+        # for json_obj in json.load(cfg): self.fields[json_obj.name] = json_obj.bbox
+        pass
 
-    def DrawMeme(self, image_handle: str, size: Coordinates, scoped_tags={}, child_tags=[]) -> Image:
+    def update_max_row(self, tag: LPOutput):
+        if type(tag.position) == str:
+            if tag.position[1].is_digit():
+                row = int(tag.position[1:])
+                self.max_row = max(self.max_row, row)
+
+    def build_lookup_table(self):
+        right = self.fields["RIGHT"]
+        left = self.fields["LEFT"]
+        for i in range(1, max_row + 1):
+            self.fields[f'r{i}'] = (initial_height, right[1], end_height, right[3])
+            self.fields[f'l{i}'] = (initial_height, left[1], end_height, left[3])
+
+    def resolve_text_args(self, tag: LPOutput):
+        # TODO: implement, or rename get_position
+        args = {}
+
+        if type(tag.position) == str:
+            if tag.position[-1] == "%":
+                # TODO: implement percentage-based text position
+                pass
+            else:
+                args["position"] = self.fields[tag.position]
+
+        return args
+
+class DrawingManager:
+    def __init__(self):
+        self.format_manager = FormatManager()
+
+    def DrawMeme(self, image_handle: str, size: Coordinates, mode: str, fillColor: str, scoped_tags={}, child_tags=[]) -> Image:
         ''' Draw a meme '''
-        
         self.format_manager.push_context(**scoped_tags)
         
-        curr_img = self.InitImage(image_handle, size)
+        meme = Meme(image_handle, size)
 
         for tag in child_tags:
             if tag.type == TagType.TEXT:
-                self.DrawText(tag, curr_img)
+                meme.update_max_row(tag)
+
+        meme.build_lookup_table()
+
+        for tag in child_tags:
+            if tag.type == TagType.TEXT:
+                args = meme.resolve_text_args(tag.data)
+                self.DrawText(meme.image, **args)
 
             elif tag.type == TagType.POP:
                 self.format_manager.pop_tag(**expand_tag(tag))
@@ -56,4 +100,10 @@ class DrawingManager:
 
         self.format_manager.pop_context()
 
-        return curr_img
+        meme.end()
+
+        return meme.img
+
+    def DrawText(self, image, text, position, rotation):
+        pass
+

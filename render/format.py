@@ -2,7 +2,7 @@ from render.format_types import Font, Alignment, Color
 import warnings
 from utils import TagType
 
-
+# TODO: support text style
 class FormatManager:
     class FormatContext:
         def __init__(self, def_font=Font(), def_align=None, def_color=None):
@@ -21,6 +21,10 @@ class FormatManager:
         @property
         def current_color(self):
             return self.colors[-1]
+
+        @property
+        def current_format(self):
+            return (self.current_font, self.current_align, self.current_color)
 
         def F_tag(self, font):
             self.fonts.append(font.inherit_from(self.current_font))

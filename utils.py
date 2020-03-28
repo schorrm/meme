@@ -26,16 +26,19 @@ def get_bbox(smaller: Coordinates, larger: Coordinates) -> BBox:
 
 @unique
 class TagType(Enum):
-    # TODO: enumerate our types
     FONT = auto()
     ALIGNMENT = auto()
     COLOR = auto()
     TEXT = auto()
+    TEXTSTYLE = auto()
     POP = auto()
+    MEME = auto()
+    COMPOSITE = auto()
+
 
     @property
     def is_format(self):
-        return self in [TagType.FONT, TagType.ALIGNMENT, TagType.COLOR]
+        return self in [TagType.FONT, TagType.ALIGNMENT, TagType.COLOR, TagType.TEXTSTYLE]
 
 def unpack(l: List, nullvalue=None):
     """ Unpacks a tuple / list of 1 or 2 items to 2, safely """
