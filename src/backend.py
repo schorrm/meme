@@ -11,7 +11,7 @@ import json
 
 from layout_objects import LPComposite, LPMeme, LPText, LPWhitespacePrefix
 
-from PIL import Image
+from PIL import Image, ImageDraw
 
 class Meme:
     _default_config = DEFAULT_FIELD_CFG
@@ -39,6 +39,7 @@ class Meme:
         self.image = image
         self.load_config(file_path)
         self.max_row = 1
+        self.draw = ImageDraw.Draw(self.image)
 
     @property
     def width(self):
@@ -97,6 +98,10 @@ class Meme:
             args["position"] = tuple(directions)
 
         return args
+
+    def add_text(self, tag: LPText, location: BBox):
+        ''' Draw text to a location '''
+
 
 class DrawingManager:
     def __init__(self):
