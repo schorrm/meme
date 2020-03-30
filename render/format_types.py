@@ -13,7 +13,7 @@ class Font:
         return self._cached_font
 
     def inherit_from(self, update_font):
-        if self.outline_size == None:
+        if self.outline_size == None: # Zero is a size, none is not
             self.outline_size = update_font.outline_size
         self.font_size = self.font_size or update_font.font_size
         self.font_face = self.font_face or update_font.font_face
@@ -50,4 +50,10 @@ class Color:
         return f'<Color: FG={self.foreground}, BG={self.background}, OL={self.outline}>'
 
 
-# TODO: Support text style
+# TODO: Support text style -- we need to figure a lot of other details here, may need tweaks
+class TextStyle:
+    def __init__(self, bold: bool = False, italic: bool = False, underline: bool = False, strikethrough: bool = False):
+        self.bold = bold
+        self.italic = italic
+        self.underline = underline
+        self.strikethrough = strikethrough
