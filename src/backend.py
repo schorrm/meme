@@ -83,17 +83,17 @@ class Meme:
         # I'm assuming here that it's going to come in as a tuple when not named?
         if type(position) == str: # this should be a named position, find appropriate tuple
             try:
-                return self.fields[position]
+                position =  self.fields[position]
             except:
                 raise KeyError("Me looking for your named position directive like")
-        else:
-            directions = list(position)
-            for direction, max_value in zip(directions, [self.width, self.height, self.width, self.height]): # l t r b
-                if direction.endswith("%"): # TODO: NOTE: This may not come as percent, 
-                                            #             we need to watch this, given that % is reserved
-                    direction = (int(direction[:-1]) / 100) * max_value # convert all % to pixel values
+    
+        directions = list(position)
+        for direction, max_value in zip(directions, [self.width, self.height, self.width, self.height]): # l t r b
+            if direction.endswith("%"): # TODO: NOTE: This may not come as percent, 
+                                        #             we need to watch this, given that % is reserved
+                direction = (int(direction[:-1]) / 100) * max_value # convert all % to pixel values
 
-            return tuple(directions)
+        return tuple(directions)
 
     def add_text(self, text: str, font: PIL.ImageFont, bbox: BBox, rotation: float):
         ''' Draw text to a location '''
@@ -119,7 +119,7 @@ class DrawingManager:
 
         for tag in child_tags:
             if tag.type == TagType.TEXT:
-                self.DrawText(meme.image, **args)
+                self.DrawText(meme, **args)
 
             elif tag.type == TagType.POP:
                 self.format_manager.pop_tag(**expand_tag(tag))
