@@ -9,6 +9,8 @@ from contextlib import suppress
 import warnings
 import json
 
+from layout_objects import LPComposite, LPMeme, LPText, LPWhitespacePrefix
+
 from PIL import Image
 
 class Meme:
@@ -35,30 +37,39 @@ class Meme:
             else:
                 raise RuntimeError("Bad Mode")
 
+        self.image = image
         self.load_config(file_path)
         self.max_row = 1
-        self.image = image
     
-    def load_config(self, file_path):
+    def load_config(self, file_path: str):
         config_path = file_path + CONFIG_EXT
         if os.path.exists(config_path):
             with open (config_path) as f:
                 self.fields.update(json.load(f))
 
-    def update_max_row(self, tag: LPOutput):
+    def update_max_row(self, tag: LPText):
         if type(tag.position) == str:
             if tag.position[1].is_digit():
                 row = int(tag.position[1:])
                 self.max_row = max(self.max_row, row)
 
     def build_lookup_table(self):
-        right = self.fields["RIGHT"]
-        left = self.fields["LEFT"]
-        for i in range(1, max_row + 1):
-            self.fields[f'r{i}'] = (initial_height, right[1], end_height, right[3])
-            self.fields[f'l{i}'] = (initial_height, left[1], end_height, left[3])
+        rtop, rright, rbottom, rleft = self.fields["RIGHT"]
+        ltop, lright, lbottom, lleft = self.fields["LEFT"]
 
-    def resolve_text_args(self, tag: LPOutput):
+        rdelta = (rtop - rbottom) / self.max_row # this may need to be //
+        ldelta = (ltop - lbottom) / self.max_row # this may need to be //
+
+        rbaseline = rtop
+        lbaseline = ltop
+
+        for i in range(1, max_row + 1):
+            self.fields[f'r{i}'] = (rbaseline, rright, rbaseline + rdelta, rleft)
+            self.fields[f'l{i}'] = (lbaseline, lright, lbaseline + ldelta, lleft)
+            rbaseline += rdelta
+            lbaseline += ldelta
+
+    def resolve_text_args(self, tag: LPText):
         # TODO: implement, or rename get_position
         args = {}
 
