@@ -7,14 +7,18 @@ import os
 import hashlib
 from contextlib import suppress
 import warnings
+import json
 
 from PIL import Image
 
 class Meme:
+    self.fields = DEFAULT_FIELD_CFG
+
     def __init__(self, image_handle: str, size: Coordinates, fillcolor: str = '#fff', mode: str = "resize"):
         ''' Create an Image to start drawing text on. '''
         if not image_handle:
-            return Image.new('RGB', size, fillcolor)
+            self.image = Image.new('RGB', size, fillcolor)
+            return
 
         file_path = resolve_file_path(image_handle)
         image = Image.open(file_path)
@@ -33,17 +37,13 @@ class Meme:
 
         self.load_config(file_path)
         self.max_row = 1
+        self.image = image
     
     def load_config(self, file_path):
         config_path = file_path + CONFIG_EXT
         if os.path.exists(config_path):
-            cfg = open(config_path)
-        else:
-            cfg = DEFAULT_TEXT_FIELD_CFG
-
-        # TODO: Implement. something like
-        # for json_obj in json.load(cfg): self.fields[json_obj.name] = json_obj.bbox
-        pass
+            with open (config_path) as f:
+                self.fields.update(json.load(f))
 
     def update_max_row(self, tag: LPOutput):
         if type(tag.position) == str:
