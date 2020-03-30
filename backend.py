@@ -73,12 +73,20 @@ class Meme:
         # TODO: implement, or rename get_position
         args = {}
 
-        if type(tag.position) == str:
-            if tag.position[-1] == "%":
-                # TODO: implement percentage-based text position
-                pass
-            else:
+        # TODO: implement percentage-based text position: I'm assuming here that it's going to come in as a tuple?
+        if type(tag.position) == str: # this should be a named position, find appropriate tuple
+            try:
                 args["position"] = self.fields[tag.position]
+            except:
+                raise KeyError("Me looking for your named position directive like")
+        else:
+            directions = list(tag.position)
+            for direction, max_value in zip(directions, self.height, self.width, self.height, self.width):
+                if direction.endswith("%"): # TODO: NOTE: This may not come as percent, 
+                    # we need to watch this, given that % is reserved
+                    direction = (int(direction[:-1]) / 100) * max_value # convert all % to pixel values
+
+            args["position"] = tuple(directions)
 
         return args
 
