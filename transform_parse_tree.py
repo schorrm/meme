@@ -5,7 +5,7 @@ from lark import Lark, Transformer
 from utils import TagType, unpack, unpack3, list2dict
 
 from render.format_types import Font, Alignment, Color
-from layout_objects import Meme, Text, Composite, WhitespacePrefix
+from layout_objects import LPMeme, LPText, LPComposite, LPWhitespacePrefix
 
 import copy
 
@@ -80,13 +80,13 @@ class ConvertParseTree(Transformer):
         position = tree.get('position')
         if position:
             tree.pop('position')
-        return (Meme(**tree), position)
+        return (LPMeme(**tree), position)
 
     def text(self, token):
         return {'text': _extract_monic(token)}
 
     def endcomposite(self, token):
-        return Pop(Composite)
+        return Pop(LPComposite)
 
     def position(self, position):
         return {'position': _extract_monic(position)}
@@ -95,7 +95,7 @@ class ConvertParseTree(Transformer):
         return {'rotation': _extract_monic(rotation)}
 
     def textblock(self, tree):
-        return Text(**list2dict(tree))
+        return LPText(**list2dict(tree))
 
     def whitespaceprefix(self, text):
-        return WhitespacePrefix(**text[0])
+        return LPWhitespacePrefix(**text[0])
