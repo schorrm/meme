@@ -12,3 +12,5 @@ LIB_DIR = '/usr/local/lib/meme/lib'
 DEFAULT_FIELD_CFG = {} # TODO : DEFINE
 
 CONFIG_EXT = '.memeconfig' # My suggestion
+
+# TODO: PUT DEFAULT CONFIGS HERE
