@@ -119,7 +119,6 @@ class DrawingManager:
 
         for tag in child_tags:
             if tag.type == TagType.TEXT:
-                args = meme.resolve_text_args(tag.data)
                 self.DrawText(meme.image, **args)
 
             elif tag.type == TagType.POP:
