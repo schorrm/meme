@@ -39,6 +39,14 @@ class Meme:
         self.image = image
         self.load_config(file_path)
         self.max_row = 1
+
+    @property
+    def width(self):
+        return self.image.size[0]
+
+    @property
+    def height(self):
+        return self.image.size[1]
     
     def load_config(self, file_path: str):
         self.fields = Meme._default_config.copy()
@@ -81,7 +89,7 @@ class Meme:
                 raise KeyError("Me looking for your named position directive like")
         else:
             directions = list(tag.position)
-            for direction, max_value in zip(directions, [self.image.size[0], self.image.size[0], self.image.size[1], self.image.size[0]]): # t r b l
+            for direction, max_value in zip(directions, [self.height, self.width, self.height, self.width]): # t r b l
                 if direction.endswith("%"): # TODO: NOTE: This may not come as percent, 
                     # we need to watch this, given that % is reserved
                     direction = (int(direction[:-1]) / 100) * max_value # convert all % to pixel values
