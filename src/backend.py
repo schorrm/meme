@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+from typing import Union
 from utils import *
 from render.format import FormatManager
 
@@ -78,26 +79,21 @@ class Meme:
             rbaseline += rdelta
             lbaseline += ldelta
 
-    def resolve_text_args(self, tag: LPText):
-        # TODO: implement, or rename get_position
-        args = {}
-
+    def resolve_position(self, position: Union[str, BBox]):
         # I'm assuming here that it's going to come in as a tuple when not named?
-        if type(tag.position) == str: # this should be a named position, find appropriate tuple
+        if type(position) == str: # this should be a named position, find appropriate tuple
             try:
-                args["position"] = self.fields[tag.position]
+                return self.fields[position]
             except:
                 raise KeyError("Me looking for your named position directive like")
         else:
-            directions = list(tag.position)
+            directions = list(position)
             for direction, max_value in zip(directions, [self.width, self.height, self.width, self.height]): # l t r b
                 if direction.endswith("%"): # TODO: NOTE: This may not come as percent, 
-                    # we need to watch this, given that % is reserved
+                                            #             we need to watch this, given that % is reserved
                     direction = (int(direction[:-1]) / 100) * max_value # convert all % to pixel values
 
-            args["position"] = tuple(directions)
-
-        return args
+            return tuple(directions)
 
     def add_text(self, text: str, font: PIL.ImageFont, bbox: BBox, rotation: float):
         ''' Draw text to a location '''
@@ -134,9 +130,7 @@ class DrawingManager:
 
         self.format_manager.pop_context()
 
-        meme.end()
-
-        return meme.img
+        return meme.image
 
     def DrawText(self, meme, text, position, rotation):
         # TODO: handle outline
