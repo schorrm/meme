@@ -3,6 +3,8 @@
 import os
 import glob
 
+from defines import *
+
 from typing import Tuple, List
 from enum import Enum, auto, unique
 
@@ -13,8 +15,6 @@ Coordinates = Tuple[int, int]
 BBox = Tuple[int, int, int, int]
 
 ## IMAGE UTILS
-
-DEFAULT_SIZE = (640, 480)
 
 def get_image_size(filename: str) -> Tuple[int, int]:
     pass
@@ -54,11 +54,6 @@ def unpack3(l: List, nullvalue=None):
 
 def list2dict(l: List[dict]):
     return dict(ChainMap(*l))
-
-# TODO: come up with some bullshit to make this platform-independent
-SML_DIR = '/usr/local/lib/meme/sml'
-LIB_DIR = '/usr/local/lib/meme/lib'
-
 
 def resolve_file_path(image_handle: str):
     # Resolve which directory we're looking at
