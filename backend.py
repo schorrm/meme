@@ -14,34 +14,34 @@ from layout_objects import LPComposite, LPMeme, LPText, LPWhitespacePrefix
 from PIL import Image
 
 class Meme:
-    self.fields = DEFAULT_FIELD_CFG
+    _default_config = DEFAULT_FIELD_CFG
 
     def __init__(self, image_handle: str, size: Coordinates, fillcolor: str = '#fff', mode: str = "resize"):
         ''' Create an Image to start drawing text on. '''
         if not image_handle:
-            self.image = Image.new('RGB', size, fillcolor)
-            return
-
-        file_path = resolve_file_path(image_handle)
-        image = Image.open(file_path)
-        if size and image.size != size:
-            
-            if mode == "resize":
-                if image.size[0]/size[0] != image.size[1]/size[1]:
-                    warnings.warn(f"Resizing image from {image.size} to {size} doesn't preserve aspect ratio", RuntimeWarning)
-                image = image.resize(size)
-            elif mode == "crop":
-                image = image.crop(get_bbox(smaller=size, larger=image))
-            elif mode == "fill":
-                image = Image.new('RGB', size, fillcolor).paste(image, get_bbox(smaller=image, larger=size))
-            else:
-                raise RuntimeError("Bad Mode")
+            image = Image.new('RGB', size, fillcolor)
+        else:
+            file_path = resolve_file_path(image_handle)
+            image = Image.open(file_path)
+            if size and image.size != size:
+                
+                if mode == "resize":
+                    if image.size[0]/size[0] != image.size[1]/size[1]:
+                        warnings.warn(f"Resizing image from {image.size} to {size} doesn't preserve aspect ratio", RuntimeWarning)
+                    image = image.resize(size)
+                elif mode == "crop":
+                    image = image.crop(get_bbox(smaller=size, larger=image))
+                elif mode == "fill":
+                    image = Image.new('RGB', size, fillcolor).paste(image, get_bbox(smaller=image, larger=size))
+                else:
+                    raise RuntimeError("Bad Mode")
 
         self.image = image
         self.load_config(file_path)
         self.max_row = 1
     
     def load_config(self, file_path: str):
+        self.fields = Meme._default_config.copy()
         config_path = file_path + CONFIG_EXT
         if os.path.exists(config_path):
             with open (config_path) as f:
@@ -63,7 +63,7 @@ class Meme:
         rbaseline = rtop
         lbaseline = ltop
 
-        for i in range(1, max_row + 1):
+        for i in range(1, self.max_row + 1):
             self.fields[f'r{i}'] = (rbaseline, rright, rbaseline + rdelta, rleft)
             self.fields[f'l{i}'] = (lbaseline, lright, lbaseline + ldelta, lleft)
             rbaseline += rdelta
@@ -81,7 +81,7 @@ class Meme:
                 raise KeyError("Me looking for your named position directive like")
         else:
             directions = list(tag.position)
-            for direction, max_value in zip(directions, [self.height, self.width, self.height, self.width]): # t r b l
+            for direction, max_value in zip(directions, [self.image.size[0], self.image.size[0], self.image.size[1], self.image.size[0]]): # t r b l
                 if direction.endswith("%"): # TODO: NOTE: This may not come as percent, 
                     # we need to watch this, given that % is reserved
                     direction = (int(direction[:-1]) / 100) * max_value # convert all % to pixel values
