@@ -9,7 +9,7 @@ from typing import Dict
 class LPMeme:
     def __init__(self, image: str = None, size=None, fillcolor='white'):
         self.image = image
-        self.size = size or get_image_size(image) or DEFAULT_SIZE
+        self.size = size
         self.fillcolor = fillcolor
 
     def __repr__(self):
