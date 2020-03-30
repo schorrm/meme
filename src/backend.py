@@ -63,8 +63,8 @@ class Meme:
                 self.max_row = max(self.max_row, row)
 
     def build_lookup_table(self):
-        rtop, rright, rbottom, rleft = self.fields["RIGHT"]
-        ltop, lright, lbottom, lleft = self.fields["LEFT"]
+        rleft, rtop, rright, rbottom = self.fields["RIGHT"]
+        lleft, ltop, lright, lbottom = self.fields["LEFT"]
 
         rdelta = (rtop - rbottom) / self.max_row # this may need to be //
         ldelta = (ltop - lbottom) / self.max_row # this may need to be //
@@ -73,8 +73,8 @@ class Meme:
         lbaseline = ltop
 
         for i in range(1, self.max_row + 1):
-            self.fields[f'r{i}'] = (rbaseline, rright, rbaseline + rdelta, rleft)
-            self.fields[f'l{i}'] = (lbaseline, lright, lbaseline + ldelta, lleft)
+            self.fields[f'r{i}'] = (rleft, rbaseline, rright, rbaseline + rdelta)
+            self.fields[f'l{i}'] = (lleft, lbaseline, lright, lbaseline + ldelta)
             rbaseline += rdelta
             lbaseline += ldelta
 
@@ -90,7 +90,7 @@ class Meme:
                 raise KeyError("Me looking for your named position directive like")
         else:
             directions = list(tag.position)
-            for direction, max_value in zip(directions, [self.height, self.width, self.height, self.width]): # t r b l
+            for direction, max_value in zip(directions, [self.width, self.height, self.width, self.height]): # l t r b
                 if direction.endswith("%"): # TODO: NOTE: This may not come as percent, 
                     # we need to watch this, given that % is reserved
                     direction = (int(direction[:-1]) / 100) * max_value # convert all % to pixel values
@@ -99,8 +99,10 @@ class Meme:
 
         return args
 
-    def add_text(self, tag: LPText, location: BBox):
+    def add_text(self, text: str, font: PIL.ImageFont, bbox: BBox, rotation: float):
         ''' Draw text to a location '''
+        # TODO: Figure out division of labor with DrawingManager.DrawText
+        pass
 
 
 class DrawingManager:
@@ -136,6 +138,18 @@ class DrawingManager:
 
         return meme.img
 
-    def DrawText(self, image, text, position, rotation):
-        pass
+    def DrawText(self, meme, text, position, rotation):
+        # TODO: handle outline
+        bbox = meme.resolve_position(position)
+        width = bbox[2] - bbox[0] # r - l
+        height = bbox[3] - bbox[1] # b - t
+        final_text, final_font = optimize_text(text, self.format_manager.current_font, width, height)
+
+        # TODO: find division of labor with Meme.add_text
+        # * Define temporary image with correct BG
+        # * render text to said image, with correct halign
+        # * redraw text with correct color
+        # * rotate temporary image
+        # * calculate paste position for proper valign
+        # * paste to actual image
 

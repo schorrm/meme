@@ -24,6 +24,8 @@ def get_bbox(smaller: Coordinates, larger: Coordinates) -> BBox:
     h_delta = (larger[1] - smaller[1])
     return (w_delta, h_delta, smaller[0]+w_delta, smaller[1]+h_delta)
 
+
+
 @unique
 class TagType(Enum):
     FONT = auto()
@@ -78,3 +80,66 @@ def resolve_file_path(image_handle: str):
         if not gresults:
             raise RuntimeError("Me looking for your image like")  # TODO: Have good errors
         return gresults[0]
+
+def _split(text):
+    """Split a line of text into two similarly sized pieces.
+    >>> _split("Hello, world!")
+    ('Hello,', 'world!')
+    >>> _split("This is a phrase that can be split.")
+    ('This is a phrase', 'that can be split.')
+    >>> _split("This_is_a_phrase_that_can_not_be_split.")
+    ('This_is_a_phrase_that_can_not_be_split.',)
+    """
+    result = (text,)
+
+    if len(text) >= 3 and ' ' in text[1:-1]:  # can split this string
+        space_indices = [i for i in range(len(text)) if text[i] == ' ']
+        space_proximities = [abs(i - len(text) // 2) for i in space_indices]
+        for i, j in zip(space_proximities, space_indices):
+            if i == min(space_proximities):
+                result = (text[:j], text[j + 1:])
+                break
+
+    return result
+
+def get_phrases(text, pil_font):
+    lines = text.split('\n')
+    return [lines, [pil_font.getsize(line) for line in lines]]
+
+def split_longest(phrases, pil_font, max_width):
+    lines, lengths = phrases
+    longest = max(lengths)
+    while longest > max_width:
+        idx = lines.index(longest)
+        split = _split(lines[idx])
+        lines = lines[:idx] + split + lines[idx+1:]
+        lengths = lengths[:idx] + [pil_font.getsize(line) for line in split] + lengths[idx+1:]
+        longest = max(lengths)
+
+    return [lines, lengths]
+
+def optimize_text(text, font, max_width, max_height):
+    pil_font = font.PIL_font
+    font_size = font.font_size
+
+    cur_text = text
+    phrases = get_phrases(text, pil_font)
+
+    success = False
+    while not success:
+        success = True
+        
+        text_size = pil_font.getsize_multiline(cur_text)
+        if text_size[0] > max_width:
+            phrases = split_long(phrases, pil_font, max_length)
+            cur_text = '\n'.join(phrases[0])
+        
+        if text_size[1] > max_height:
+            font_size -= 1
+            if font_size == 0:
+                raise RuntimeError("Too much text")
+            pil_font = pil_font.font_variant(size=font_size)
+            phrases = get_phrases(text, pil_font)
+            cur_text = text
+
+    return text, pil_font
