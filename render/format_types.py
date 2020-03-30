@@ -1,8 +1,9 @@
 class Font:
-    def __init__(self, font_face='impact', font_size=14, outline_size=0):
+    def __init__(self, font_face='impact', font_size=14, outline_size=0, text_style='r'):
         self.font_face = font_face
         self.font_size = font_size
         self.outline_size = outline_size
+        self.text_style = text_style
         self._cached_font = None
 
     @property
@@ -17,9 +18,11 @@ class Font:
             self.outline_size = update_font.outline_size
         self.font_size = self.font_size or update_font.font_size
         self.font_face = self.font_face or update_font.font_face
+        self.text_style = self.text_style or update_font.text_style
+        return self
 
     def __repr__(self):
-        return f'<{self.font_face} {self.font_size}, {self.outline_size}>'
+        return f'<{self.font_face} {self.font_size}{self.text_style}, {self.outline_size}>'
 
 
 class Alignment:
@@ -30,6 +33,7 @@ class Alignment:
     def inherit_from(self, update_alignment):
         self.halign = self.halign or update_alignment.halign
         self.valign = self.valign or update_alignment.valign
+        return self
 
     def __repr__(self):
         return f'<Align {self.halign}, {self.valign}>'
@@ -45,6 +49,7 @@ class Color:
         self.foreground = self.foreground or update_color.foreground
         self.background = self.background or update_color.background
         self.outline = self.outline or update_color.outline
+        return self
 
     def __repr__(self):
         return f'<Color: FG={self.foreground}, BG={self.background}, OL={self.outline}>'

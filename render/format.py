@@ -2,7 +2,10 @@ from render.format_types import Font, Alignment, Color
 import warnings
 from utils import TagType
 
-# TODO: support text style
+# TODO: text style supported as 4th field on Font obj. How does text_style work?
+# * is /TS:style/ tag only shorthand for /F:::style/?
+# * is it toggle bitfield or overwrite?
+# * what happens if calling /END:TS/ after /F/ or vice versa? (Do we need a 4th Style object?)
 class FormatManager:
     class FormatContext:
         def __init__(self, def_font=Font(), def_align=None, def_color=None):
@@ -35,6 +38,9 @@ class FormatManager:
         def CL_tag(self, color):
             self.colors.append(color.inherit_from(self.current_color))
 
+        def TS_tag(self, font):
+            self.F_tag(font)
+
         def update_context(self, tag):
             # TODO: Actually define the tag type and how to access it / pull details out of it.
             if tag.type == TagType.FONT:
@@ -43,6 +49,8 @@ class FormatManager:
                 self.AL_tag(tag.data)
             elif tag.type == TagType.COLOR:
                 self.CL_tag(tag.data)
+            elif tag.type == TagType.TEXTSTYLE:
+                self.TS_tag(tag.data)
             elif tag.type == TagType.POP:
                 warnings.warn("Got POP tag in update_context(). pop_tag() should be called explicitly", RuntimeWarning)
                 self.pop_tag(tag)
@@ -59,6 +67,8 @@ class FormatManager:
                 thing = self.aligns
             elif tag.data == 'CL':
                 thing = self.colors
+            elif tag.data == 'TS':
+                thing = self.fonts
             else:
                 raise RuntimeError("Invalid pop tag data")
 
@@ -89,12 +99,16 @@ class FormatManager:
 
     def scoped_F_tag(self, font_face, font_size, outline_size):
         """ Convenience function for a scoped font tag on a text block, to avoid needing to call push/get/pop """
-        return self.current_font.inherit(font_face, font_size, outline_size)
+        return Font(font_face, font_size, outline_size, None).inherit_from(self.current_font)
 
     def scoped_AL_tag(self, horizontal, vertical):
         """ Convenience function for a scoped alignment tag on a text block, to avoid needing to call push/get/pop """
-        return self.current_align.inherit(horizontal, vertical)
+        return Align(horizontal, vertical).inherit_from(self.current_align)
 
     def scoped_CL_tag(self, foreground, background, outline):
         """ Convenience function for a scoped color tag on a text block, to avoid needing to call push/get/pop """
-        return self.current_color.inherit(foreground, background, outline)
+        return Color(foreground, background, outline).inherit_from(self.current_color)
+
+    def scoped_TS_tag(self, text_style):
+        """ Convenience function for a scoped text style tag on a text block, to avoid needing to call push/get/pop """
+        return Font(None, None, None, text_style).inherit_from(self.current_font)
