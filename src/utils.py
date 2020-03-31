@@ -114,14 +114,14 @@ def optimize_text(text, font, max_width, max_height=None):
     while not success:
         success = True
         
-        text_size = pil_font.getsize_multiline(cur_text, )
+        text_size = pil_font.getsize_multiline(cur_text, stroke_width=stroke_width)
         if text_size[0] > max_width:
             phrases = split_long(phrases, pil_font, stroke_width, max_width)
             cur_text = '\n'.join(phrases[0])
             success = False
         
         # None == infinite
-        if max_height and text_size[1] > max_height:
+        if max_height and (text_size[1] > max_height):
             font_size -= 1
             if font_size == 0:
                 raise RuntimeError("Too much text")
