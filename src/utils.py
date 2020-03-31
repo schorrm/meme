@@ -3,7 +3,7 @@
 import os
 import glob
 
-from defines import *
+from defines import LIB_DIR, SML_DIR
 
 from typing import Tuple, List, Union
 from enum import Enum, auto, unique
@@ -24,24 +24,6 @@ def get_bbox(smaller: Coordinates, larger: Coordinates) -> BBox:
     w_delta = (larger[0] - smaller[0])
     h_delta = (larger[1] - smaller[1])
     return (w_delta, h_delta, smaller[0]+w_delta, smaller[1]+h_delta)
-
-
-
-@unique
-class TagType(Enum):
-    FONT = auto()
-    ALIGNMENT = auto()
-    COLOR = auto()
-    TEXT = auto()
-    TEXTSTYLE = auto()
-    POP = auto()
-    MEME = auto()
-    COMPOSITE = auto()
-
-
-    @property
-    def is_format(self):
-        return self in [TagType.FONT, TagType.ALIGNMENT, TagType.COLOR, TagType.TEXTSTYLE]
 
 def unpack(l: List, nullvalue=None):
     """ Unpacks a tuple / list of 1 or 2 items to 2, safely """
@@ -119,7 +101,7 @@ def split_long(phrases, pil_font, stroke_width, max_width):
 
     return [lines, lengths]
 
-def optimize_text(text, font, max_width, max_height):
+def optimize_text(text, font, max_width, max_height=None):
     pil_font = font.PIL_font
     font_size = font.font_size
     # TODO: is this the correct value for stroke_width or does font_size also factor in somehow?
@@ -138,7 +120,8 @@ def optimize_text(text, font, max_width, max_height):
             cur_text = '\n'.join(phrases[0])
             success = False
         
-        if text_size[1] > max_height:
+        # None == infinite
+        if max_height and text_size[1] > max_height:
             font_size -= 1
             if font_size == 0:
                 raise RuntimeError("Too much text")

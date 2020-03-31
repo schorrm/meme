@@ -1,0 +1,8 @@
+{
+    "namedFields": {
+        "top" : [],
+        "bottom": [],
+        "snout": []
+    },
+    "defaultOrder": [ [1,2,3,4], "top", "bottom", "r3", "snout"]
+}

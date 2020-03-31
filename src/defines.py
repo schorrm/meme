@@ -1,13 +1,13 @@
 #!/usr/bin/python3
 
 import os.path
+from enum import Enum, auto, unique
 
 # We were worried about too much in utils, so we now have a separation.
 # This file is meant for all the various global defaults and settings.
 
 DEFAULT_SIZE = (640, 480)
 
-# TODO: come up with some bullshit to make this platform-independent. These good?
 SML_DIR = os.path.join(os.path.expanduser("~"), '.local', 'lib', 'meme', 'sml')
 LIB_DIR = os.path.join(os.path.expanduser("~"), '.local', 'lib', 'meme', 'libs')
 
@@ -25,7 +25,25 @@ DEFAULT_FIELD_CFG = { "RIGHT"  : ("50%",  "0%", "100%", "100%"), # r1..rn
                     }
 DEFAULT_FIELD_ORDER = ("top", "bottom", "center", "rtop", "rbottom", "rcenter", "ltop", "lbottom", "lcenter")
 
-CONFIG_EXT = '.memeconfig' # My suggestion. I approve. Would still be neat to support embedding this stuff in JPEG EXIF fields / PNG Text chunks
+CONFIG_EXT = '.memeconfig' # Would still be neat to support embedding this stuff in JPEG EXIF fields / PNG Text chunks. -> later version
+
+@unique
+class TagType(Enum):
+    FONT = auto()
+    ALIGNMENT = auto()
+    COLOR = auto()
+    TEXT = auto()
+    TEXTSTYLE = auto()
+    POP = auto()
+    MEME = auto()
+    COMPOSITE = auto()
+    WHITESPACE = auto()
+
+
+    @property
+    def is_format(self):
+        return self in [TagType.FONT, TagType.ALIGNMENT, TagType.COLOR, TagType.TEXTSTYLE]
+    
 
 # TODO: PUT DEFAULT CONFIGS HERE
 # -> What additional configs are missing?

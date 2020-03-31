@@ -2,9 +2,10 @@
 
 from lark import Lark, Transformer
 
-from utils import TagType, unpack, unpack3, list2dict
+from utils import unpack, unpack3, list2dict
+from defines import TagType
 
-from render.format_types import Font, Alignment, Color
+from format_types import Font, Alignment, Color
 from layout_objects import LPMeme, LPText, LPComposite, LPWhitespacePrefix, Pop
 
 import copy

@@ -1,3 +1,5 @@
+from defines import TagType
+
 class Font:
     def __init__(self, font_face='impact', font_size=14, outline_size=0, text_style='r'):
         self.font_face = font_face
@@ -5,6 +7,7 @@ class Font:
         self.outline_size = outline_size
         self.text_style = text_style
         self._cached_font = None
+        self.type = TagType.FONT
 
     @property
     def PIL_font(self):
@@ -29,6 +32,7 @@ class Alignment:
     def __init__(self, halign: str, valign: str):
         self.halign = halign
         self.valign = valign
+        self.type = TagType.ALIGNMENT
 
     def inherit_from(self, update_alignment):
         self.halign = self.halign or update_alignment.halign
@@ -44,6 +48,7 @@ class Color:
         self.foreground = foreground
         self.background = background
         self.outline = outline
+        self.type = TagType.COLOR
 
     def inherit_from(self, update_color):
         self.foreground = self.foreground or update_color.foreground
@@ -63,3 +68,4 @@ class TextStyle:
         self.italic = italic
         self.underline = underline
         self.strikethrough = strikethrough
+        self.type = TagType.TEXTSTYLE

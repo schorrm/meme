@@ -2,7 +2,8 @@
 
 from typing import Union
 from utils import *
-from render.format import FormatManager
+from defines import *
+from format import FormatManager
 
 import os
 import hashlib
@@ -41,7 +42,7 @@ class Meme:
         self.image = image
         self.load_config(file_path)
         self.max_row = 1
-        self.draw = ImageDraw.Draw(self.image)
+        self.draw = ImageDraw.Draw(self.image, mode="RGBA")
 
     @property
     def width(self):
@@ -61,6 +62,7 @@ class Meme:
                 self.fields.update(field_data["namedFields"])
                 if field_data.get("defaultOrder"):
                     self.field_order = field_data["defaultOrder"]
+        self.fields["all"] = ("0%", "0%", "100%", "100%") # this is defined here so that its a super untouchable reserved thingy
                 
         self.active_mode = 'general'
         self.mode_generators = {
@@ -155,40 +157,49 @@ class DrawingManager:
     def __init__(self):
         self.format_manager = FormatManager()
 
-    def DrawMeme(self, image_handle: str, size: Coordinates, mode: str, fillColor: str, scoped_tags={}, child_tags=[]) -> Image:
-        ''' Draw a meme '''
-        self.format_manager.push_context(**scoped_tags)
+    def DrawMeme(self, tag: LPMeme, scoped_tags=[], child_tags=[]) -> Image:
         
-        meme = Meme(image_handle, size)
+        
+        ''' Draw a meme '''
+        self.format_manager.push_context(scoped_tags)
+        
+        meme = Meme(tag.image, tag.size, tag.fillcolor, tag.mode)
 
         for tag in child_tags:
-            if tag.type == TagType.TEXT:
+            if type(tag) == LPText:
                 meme.update_max_row(tag)
 
         meme.build_lookup_table()
 
-        for tag in child_tags:
-            if tag.type == TagType.TEXT:
-                self.DrawText(meme, **args)
+        for tag_or_scope in child_tags:
+            if tag_or_scope.type == TagType.TEXT:
+                # TODO: scoped format tags
+                self.DrawText(meme, tag_or_scope)
 
-            elif tag.type == TagType.POP:
-                self.format_manager.pop_tag(**expand_tag(tag))
+            elif tag_or_scope.type == TagType.POP:
+                self.format_manager.pop_tag(tag_or_scope.target)
 
             else: # otherwise it's a formatting tag
-                self.format_manager.update_context(tag)
+                self.format_manager.update_context(tag_or_scope)
 
         self.format_manager.pop_context()
 
         return meme.image
 
-    def DrawText(self, meme, text, position, rotation):
+    def DrawText(self, meme, scope):
+        text     = scope.tag.text
+        position = scope.tag.position
+        #rotation = scope.tag.rotation
+
         bbox = meme.resolve_position(position)
         width = bbox[2] - bbox[0] # r - l
-        height = bbox[3] - bbox[1] # b - t
+        height = bbox[3] - bbox[1] if meme.has_height else None # b - t
 
-        context = get_current_format_context() # how does this work? don't care, resolve scoped tags with current context
+        context = self.format_manager.scoped_context(scope.scoped_tags) # how does this work? don't care, resolve scoped tags with current context
 
         final_text, final_font, (final_width, final_height) = optimize_text(text, context.font, width, height)
+        if height is None:
+            height = final_height
         if context.current_color.background:
             temp = Image.new("RGBA", (width, height), color=context.current_color.background)
         else:

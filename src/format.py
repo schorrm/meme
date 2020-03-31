@@ -1,6 +1,6 @@
-from render.format_types import Font, Alignment, Color
+from format_types import Font, Alignment, Color
 import warnings
-from utils import TagType
+from defines import TagType
 
 # TODO: text style supported as 4th field on Font obj. How does text_style work?
 # * is /TS:style/ tag only shorthand for /F:::style/?
@@ -44,15 +44,15 @@ class FormatManager:
         def update_context(self, tag):
             # TODO: Actually define the tag type and how to access it / pull details out of it.
             if tag.type == TagType.FONT:
-                self.F_tag(tag.data)
+                self.F_tag(tag)
             elif tag.type == TagType.ALIGNMENT:
-                self.AL_tag(tag.data)
+                self.AL_tag(tag)
             elif tag.type == TagType.COLOR:
-                self.CL_tag(tag.data)
+                self.CL_tag(tag)
             elif tag.type == TagType.TEXTSTYLE:
-                self.TS_tag(tag.data)
+                self.TS_tag(tag)
             elif tag.type == TagType.POP:
-                warnings.warn("Got POP tag in update_context(). pop_tag() should be called explicitly", RuntimeWarning)
+                warnings.warn("Got POP tag in update_context(). pop_tag() should be called explicitly", SyntaxWarning)
                 self.pop_tag(tag)
             else:
                 # TODO: Usefuller error messages. Own error type(s)?
@@ -61,13 +61,13 @@ class FormatManager:
         def pop_tag(self, tag):
             """ Handles a pop tag """
             # TODO: Better name for thing
-            if tag.data == 'F':
+            if tag.data == TagType.FONT:
                 thing = self.fonts
-            elif tag.data == 'AL':
+            elif tag.data == TagType.ALIGNMENT:
                 thing = self.aligns
-            elif tag.data == 'CL':
+            elif tag.data == TagType.COLOR:
                 thing = self.colors
-            elif tag.data == 'TS':
+            elif tag.data == TagType.TEXTSTYLE:
                 thing = self.fonts
             else:
                 raise RuntimeError("Invalid pop tag data")
@@ -75,20 +75,30 @@ class FormatManager:
             if len(thing) > 1:
                 thing.pop()
             else:
-                raise RuntimeError("Can't pop default formatting specifier")
+                raise SyntaxError("Can't pop default formatting specifier")
+        
+        def _flatten(self):
+            self.fonts = [self.current_font]
+            self.aligns = [self.current_align]
+            self.colors = [self.current_color]
+
 
     @property
     def _current_context(self):
         return self.contexts[-1]
 
     def __init__(self):
-        self.contexts = []
+        self.contexts = [FormatManager.FormatContext()]
 
-    def push_context(self, f_tag=None, al_tag=None, cl_tag=None):
+    def push_context(self, scoped_tags):
         """ Adds a new context (Container or Meme) to the stack """
-        self.contexts.append(FormatManager.FormatContext(f_tag or self.current_font,
-                                                         al_tag or self.current_align,
-                                                         cl_tag or self.current_color))
+        self.contexts.append(FormatManager.FormatContext(self.current_font,
+                                                         self.current_align,
+                                                         self.current_color))
+        for tag in scoped_tags:
+            self.update_context(tag)
+        
+        self._current_context._flatten()
 
     def pop_context(self):
         """ Remove the current context when the Meme/Container ends """
@@ -97,18 +107,10 @@ class FormatManager:
     def __getattr__(self, attr):
         return getattr(self._current_context, attr)
 
-    def scoped_F_tag(self, font_face, font_size, outline_size):
-        """ Convenience function for a scoped font tag on a text block, to avoid needing to call push/get/pop """
-        return Font(font_face, font_size, outline_size, None).inherit_from(self.current_font)
+    def scoped_context(self, scoped_tags):
+        """ Convenience function for handling scoped format tags, use instead of push/update/pop """
+        self.push_context(scoped_tags)
+        context = self._current_context
+        self.pop_context()
+        return context
 
-    def scoped_AL_tag(self, horizontal, vertical):
-        """ Convenience function for a scoped alignment tag on a text block, to avoid needing to call push/get/pop """
-        return Align(horizontal, vertical).inherit_from(self.current_align)
-
-    def scoped_CL_tag(self, foreground, background, outline):
-        """ Convenience function for a scoped color tag on a text block, to avoid needing to call push/get/pop """
-        return Color(foreground, background, outline).inherit_from(self.current_color)
-
-    def scoped_TS_tag(self, text_style):
-        """ Convenience function for a scoped text style tag on a text block, to avoid needing to call push/get/pop """
-        return Font(None, None, None, text_style).inherit_from(self.current_font)
