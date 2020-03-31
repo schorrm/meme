@@ -158,9 +158,9 @@ class Meme:
         # handle percentages
         return self._convert_percentage_values(position)
 
-    def add_text(self, text_img: Image, position: BBox):
+    def add_text(self, text_img: Image, position: Coordinates):
         ''' Draw text to a location '''
-        self.image.paste(text_img, position, text_img)
+        self.image.alpha_composite(text_img, position)
 
 class DrawingManager:
     def __init__(self):
@@ -243,5 +243,5 @@ class DrawingManager:
         #     y = bbox[1] + (height - new_height)/2
         # else:
         #     x, y, _, _ = bbox
-        meme.add_text(temp, bbox) # paste to actual image
+        meme.add_text(temp, bbox[:2]) # paste to actual image
 

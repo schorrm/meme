@@ -94,6 +94,10 @@ class StackManager:
                 else:
                     self.current_scope.children.append(tag)
 
+        # implictly popping the meme caused non-existant scope errors
+        if self.current_scope.type == TagType.MEME:
+            self.pop_meme()
+
         while len(self.scopes) > 1:
             self.pop_composite()
         
