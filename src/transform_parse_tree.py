@@ -5,15 +5,9 @@ from lark import Lark, Transformer
 from utils import TagType, unpack, unpack3, list2dict
 
 from render.format_types import Font, Alignment, Color
-from layout_objects import LPMeme, LPText, LPComposite, LPWhitespacePrefix
+from layout_objects import LPMeme, LPText, LPComposite, LPWhitespacePrefix, Pop
 
 import copy
-
-
-class Pop:
-    def __init__(self, tag: str):
-        self.tag = tag
-
 
 def _extract_monic(tree):
     if tree:
@@ -38,7 +32,7 @@ class ConvertParseTree(Transformer):
 
     def font(self, subtree):
         if not subtree:
-            return Pop('font')
+            return Pop(TagType.FONT)
         font_name, font_size, outline_size = unpack3(subtree)
         return Font(font_name, font_size, outline_size)
 
@@ -50,7 +44,7 @@ class ConvertParseTree(Transformer):
 
     def align(self, alignments):
         if not alignments:
-            return Pop('align')
+            return Pop(TagType.ALIGNMENT)
         halign, valign = unpack(alignments)
         return Alignment(halign, valign)
 
@@ -58,6 +52,8 @@ class ConvertParseTree(Transformer):
         return _extract_monic(color)
 
     def colorblock(self, colors):
+        if not colors:
+            return Pop(TagType.COLOR)
         return Color(*colors)
 
     def imagehandle(self, image):
@@ -77,16 +73,16 @@ class ConvertParseTree(Transformer):
     # Layout Blocks:
     def memeblock(self, tree):
         tree = list2dict(tree)
-        position = tree.get('position')
-        if position:
-            tree.pop('position')
-        return (LPMeme(**tree), position)
+        # position = tree.get('position')
+        # if position:
+        #     tree.pop('position')
+        return LPMeme(**tree)
 
     def text(self, token):
         return {'text': _extract_monic(token)}
 
     def endcomposite(self, token):
-        return Pop(LPComposite)
+        return Pop(TagType.COMPOSITE)
 
     def position(self, position):
         return {'position': _extract_monic(position)}

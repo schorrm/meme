@@ -56,6 +56,7 @@ class Color:
 
 
 # TODO: Support text style -- we need to figure a lot of other details here, may need tweaks
+# Not guaranteed support in 1.0
 class TextStyle:
     def __init__(self, bold: bool = False, italic: bool = False, underline: bool = False, strikethrough: bool = False):
         self.bold = bold

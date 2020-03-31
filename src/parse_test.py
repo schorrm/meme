@@ -4,6 +4,8 @@ from lark import Lark
 
 from transform_parse_tree import ConvertParseTree
 
+from stack_manager import StackManager
+
 import pprint
 
 with open('grammar_enforcing.lark') as f:
@@ -37,6 +39,7 @@ strings = [
     "/M/AL::b/AL:c:c/",
     "/M:doge:640x420::1,3;F:Helvetica:20/AL::b/F::22/AL:c:c/T:SomeTextHere/AL:c/AL::c/CL:aliceblue:#fff:#000/CL:::tomato/",
     "/WP:MFW_when/M:doge;F:arial:12/T:SomeoneIsDoging:bottom/",
+    "/WP:MFW_when/M:doge;F:arial:12/F/CL/AL/T:SomeoneIsDoging:bottom/",
 ]
 
 transformer = ConvertParseTree()
@@ -46,3 +49,12 @@ for s in strings:
     # print(l.parse(s).pretty())
     pprint.pprint(transformer.transform(l.parse(s)))
     print()
+
+tl = transformer.transform(l.parse(s))
+manager = StackManager()
+manager.parse(tl)
+
+for scope in manager.scopes:
+    print (scope)
+
+print(len(manager.scopes))

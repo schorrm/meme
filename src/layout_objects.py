@@ -6,14 +6,24 @@ Class for intermediate layout objects
 from utils import get_image_size, DEFAULT_SIZE, TagType
 from typing import Dict
 
+class Pop:
+    def __init__(self, tag: TagType):
+        self.tag = tag
+
+    def __repr__(self):
+        return f'<Pop {self.tag}>'
+
+
 class LPMeme:
-    def __init__(self, image: str = None, size=None, fillcolor='white'):
+    def __init__(self, image: str = None, size=None, fillcolor='white', position=None):
         self.image = image
         self.size = size
         self.fillcolor = fillcolor
+        self.gridposition = position
 
     def __repr__(self):
-        return f'<Meme: {self.image} ({self.size[0]}x{self.size[1]})>'
+        coords = f'({self.size[0]}x{self.size[1]})' if self.size else f'(?x?)'
+        return f'<Meme: {self.image} {coords} @{self.gridposition}>'
 
 class LPText:
     def __init__(self, text, position=None, rotation=0):
@@ -25,7 +35,12 @@ class LPText:
         return f'<Text "{self.text}" @{self.position}>'
 
 class LPComposite:
-    pass
+    def __init__(self, gridsize=None, gridposition=None):
+        self.gridsize = gridsize
+        self.gridposition = gridposition
+
+    def __repr__(self):
+        return f'<LPComposite: {self.gridsize} @{self.gridposition}>'
 
 class LPWhitespacePrefix:
     def __init__(self, text):
