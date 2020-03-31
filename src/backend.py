@@ -16,6 +16,7 @@ from PIL import Image, ImageDraw
 
 class Meme:
     _default_config = DEFAULT_FIELD_CFG
+    _default_order = DEFAULT_FIELD_ORDER
 
     def __init__(self, image_handle: str, size: Coordinates, fillcolor: str = '#fff', mode: str = "resize"):
         ''' Create an Image to start drawing text on. '''
@@ -53,9 +54,41 @@ class Meme:
     def load_config(self, file_path: str):
         self.fields = Meme._default_config.copy()
         config_path = file_path + CONFIG_EXT
+        self.field_order = Meme._default_order
         if os.path.exists(config_path):
             with open (config_path) as f:
-                self.fields.update(json.load(f))
+                field_data = json.load(f)
+                self.fields.update(field_data["namedFields"])
+                if field_data.get("defaultOrder"):
+                    self.field_order = field_data["defaultOrder"]
+                
+        self.active_mode = 'general'
+        self.mode_generators = {
+            # self.fields only has str indices, so if self.field_order[idx] is a tuple we get None and return the tuple
+            "general": lambda idx: self.fields.get(self.field_order[idx]) or self.field_order[idx],
+            "r": lambda idx: self.fields[f"r{idx}"],
+            "l": lambda idx: self.fields[f"l{idx}"]
+        }
+        self.mode_indices = {
+            "general": 0,
+            "r": 1,
+            "l": 1
+        }
+
+    @property
+    def active_index(self):
+        return self.mode_indices[self.active_mode]
+
+    def update_index(self, last=None):
+        """ steps the active index, if a last parameter is given, it sets the counter to there first"""
+        if last is not None:
+            self.mode_indices[self.active_mode] = last
+        else:
+            self.mode_indices[self.active_mode] += 1
+
+    @property
+    def next_position(self) -> BBox:
+        return self.mode_generators[self.active_mode](self.active_index)
 
     def update_max_row(self, tag: LPText):
         if type(tag.position) == str:
@@ -79,23 +112,41 @@ class Meme:
             rbaseline += rdelta
             lbaseline += ldelta
 
-    def resolve_position(self, position: Union[str, BBox]):
-        # I'm assuming here that it's going to come in as a tuple when not named?
-        if type(position) == str: # this should be a named position, find appropriate tuple
+    def resolve_position(self, position: Union[str, BBox, int, None]):
+        if type(position) == int: # general position index -> tuple/named position
+            self.active_mode = "general"
+            self.update_index(position)
+            position = self.next_position
+        elif type(position) == str: # this should be a named position, find appropriate tuple
+            # allow auto position to work after l/r explicit position
+            if position[0] in "lr" and position[1].is_digit():
+                self.active_mode = position[0]
+                self.update_index(int(position[1:]))
+            elif position in self.field_order: # allow implicit following of general order
+                self.active_mode = "general"
+                self.update_index(self.field_order.index(position))
             try:
-                position =  self.fields[position]
+                # Not using next_position to explicitly catch bad names
+                position = self.fields[position]
             except:
                 raise KeyError("Me looking for your named position directive like")
-    
+        elif not position: # auto case
+            position = self.next_position
+        
+        # self.next_position is guaranteed to be the current position at this point
+        # so here we prep for the next call
+        self.update_index()
+        
+        # handle percentages
         directions = list(position)
         for direction, max_value in zip(directions, [self.width, self.height, self.width, self.height]): # l t r b
             if direction.endswith("%"): # TODO: NOTE: This may not come as percent, 
                                         #             we need to watch this, given that % is reserved
-                direction = (int(direction[:-1]) / 100) * max_value # convert all % to pixel values
+                direction = round((int(direction[:-1]) / 100) * max_value) # convert all % to pixel values
 
         return tuple(directions)
 
-    def add_text(self, text: str, font: PIL.ImageFont, bbox: BBox, rotation: float):
+    def add_text(self, text: str, font: ImageFont, bbox: BBox, rotation: float):
         ''' Draw text to a location '''
         # TODO: Figure out division of labor with DrawingManager.DrawText
         pass

@@ -5,14 +5,15 @@ import glob
 
 from defines import *
 
-from typing import Tuple, List
+from typing import Tuple, List, Union
 from enum import Enum, auto, unique
 
 from collections import ChainMap
 
 from typing import Tuple
 Coordinates = Tuple[int, int]
-BBox = Tuple[int, int, int, int]
+# 4 position coordinates each either a pixel number or a percentage string
+BBox = Tuple[Union[int, str], Union[int, str], Union[int, str], Union[int, str]]
 
 ## IMAGE UTILS
 
