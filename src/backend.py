@@ -182,7 +182,6 @@ class DrawingManager:
 
         for tag_or_scope in child_tags:
             if tag_or_scope.type == TagType.TEXT:
-                # TODO: scoped format tags
                 self.DrawText(meme, tag_or_scope)
 
             elif tag_or_scope.type == TagType.POP:

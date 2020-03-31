@@ -42,7 +42,6 @@ class FormatManager:
             self.F_tag(font)
 
         def update_context(self, tag):
-            # TODO: Actually define the tag type and how to access it / pull details out of it.
             if tag.type == TagType.FONT:
                 self.F_tag(tag)
             elif tag.type == TagType.ALIGNMENT:
@@ -60,20 +59,19 @@ class FormatManager:
 
         def pop_tag(self, tag):
             """ Handles a pop tag """
-            # TODO: Better name for thing
             if tag == TagType.FONT:
-                thing = self.fonts
+                target_array = self.fonts
             elif tag == TagType.ALIGNMENT:
-                thing = self.aligns
+                target_array = self.aligns
             elif tag == TagType.COLOR:
-                thing = self.colors
+                target_array = self.colors
             elif tag == TagType.TEXTSTYLE:
-                thing = self.fonts
+                target_array = self.fonts
             else:
                 raise RuntimeError("Invalid pop tag data")
 
-            if len(thing) > 1:
-                thing.pop()
+            if len(target_array) > 1:
+                target_array.pop()
             else:
                 raise SyntaxError("Can't pop default formatting specifier")
         

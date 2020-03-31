@@ -35,7 +35,7 @@ class StackManager:
         self.drawing_manager = DrawingManager()
 
     @property
-    def current_scope(self): # TODO: this warning code is triggering for some reason. Figure it out
+    def current_scope(self):
         if len(self.scopes) == 0:
             warnings.warn("Trying to access non-existant scope. Attempting recovery", SyntaxWarning)
             recovery_scope = Scope(tag=LPComposite(gridsize=(1, None)))
@@ -115,13 +115,13 @@ class StackManager:
                     images.append(child)
                     deferred.append(i)
                 else:
-                    image = self.drawing_manager.DrawMeme(child.tag, child.scoped_tags, child.children) # TODO: exact call args
+                    image = self.drawing_manager.DrawMeme(child.tag, child.scoped_tags, child.children)
                     images.append(image)
         
         for idx in reversed(deferred):
             child = images[idx]
             child.tag.size[0] = images[idx+1].size[0]
-            images[idx] = self.drawing_manager.DrawMeme(child.tag, child.scoped_tags, child.children) # TODO: exact call args
+            images[idx] = self.drawing_manager.DrawMeme(child.tag, child.scoped_tags, child.children)
         
         cols, rows = scope.tag.gridsize
         if rows is None:
@@ -148,7 +148,7 @@ class StackManager:
         row_heights = [max(map(lambda c: grid[c][r]["image"].size[1], range(cols))) for r in range(rows)]
         
         positions = [[None]*cols for _ in range(rows)]
-        # TODO: construct all the position variables
+        
         for r in range(rows):
             for c in range(cols):
                 positions[r][c] = (sum(col_widths[:c]), sum(row_heights[:r]))

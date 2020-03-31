@@ -44,7 +44,3 @@ class TagType(Enum):
     @property
     def is_format(self):
         return self in [TagType.FONT, TagType.ALIGNMENT, TagType.COLOR, TagType.TEXTSTYLE]
-    
-
-# TODO: PUT DEFAULT CONFIGS HERE
-# -> What additional configs are missing?

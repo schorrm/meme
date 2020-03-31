@@ -107,7 +107,6 @@ def split_long(phrases, pil_font, stroke_width, max_width):
 def optimize_text(text, font, max_width, max_height=None):
     pil_font = font.PIL_font
     font_size = font.font_size
-    # TODO: is this the correct value for stroke_width or does font_size also factor in somehow?
     stroke_width = font.outline_size or 0
     
     cur_text = text
@@ -125,7 +124,7 @@ def optimize_text(text, font, max_width, max_height=None):
         
         # None == infinite
         if max_height and (text_size[1] > max_height):
-            font_size -= 1
+            font_size -= 1 # TODO: Better alg for finding this. Given font sizes of ~100, this can be SLOOOOOW
             if font_size == 0:
                 raise RuntimeError("Too much text")
             pil_font = pil_font.font_variant(size=font_size)
