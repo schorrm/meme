@@ -103,18 +103,18 @@ def _split(text):
 
     return result
 
-def get_phrases(text, pil_font):
+def get_phrases(text, pil_font, stroke_width):
     lines = text.split('\n')
-    return [lines, [pil_font.getsize(line) for line in lines]]
+    return [lines, [pil_font.getsize(line, stroke_width) for line in lines]]
 
-def split_longest(phrases, pil_font, max_width):
+def split_long(phrases, pil_font, stroke_width, max_width):
     lines, lengths = phrases
     longest = max(lengths)
     while longest > max_width:
         idx = lines.index(longest)
         split = _split(lines[idx])
         lines = lines[:idx] + split + lines[idx+1:]
-        lengths = lengths[:idx] + [pil_font.getsize(line) for line in split] + lengths[idx+1:]
+        lengths = lengths[:idx] + [pil_font.getsize(line, stroke_width) for line in split] + lengths[idx+1:]
         longest = max(lengths)
 
     return [lines, lengths]
@@ -122,17 +122,19 @@ def split_longest(phrases, pil_font, max_width):
 def optimize_text(text, font, max_width, max_height):
     pil_font = font.PIL_font
     font_size = font.font_size
+    # TODO: is this the correct value for stroke_width or does font_size also factor in somehow?
+    stroke_width = font.outline_size or 0
 
     cur_text = text
-    phrases = get_phrases(text, pil_font)
+    phrases = get_phrases(text, pil_font, stroke_width)
 
     success = False
     while not success:
         success = True
         
-        text_size = pil_font.getsize_multiline(cur_text)
+        text_size = pil_font.getsize_multiline(cur_text, )
         if text_size[0] > max_width:
-            phrases = split_long(phrases, pil_font, max_length)
+            phrases = split_long(phrases, pil_font, stroke_width, max_width)
             cur_text = '\n'.join(phrases[0])
             success = False
         
@@ -141,7 +143,7 @@ def optimize_text(text, font, max_width, max_height):
             if font_size == 0:
                 raise RuntimeError("Too much text")
             pil_font = pil_font.font_variant(size=font_size)
-            phrases = get_phrases(text, pil_font)
+            phrases = get_phrases(text, pil_font, stroke_width)
             cur_text = text
             success = False
 

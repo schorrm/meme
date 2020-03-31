@@ -182,7 +182,6 @@ class DrawingManager:
         return meme.image
 
     def DrawText(self, meme, text, position, rotation):
-        # TODO: handle outline
         bbox = meme.resolve_position(position)
         width = bbox[2] - bbox[0] # r - l
         height = bbox[3] - bbox[1] # b - t
