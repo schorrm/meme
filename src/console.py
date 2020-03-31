@@ -36,5 +36,9 @@ if not memestr:
     with open(args.loadfile) as f:
         memestr = f.read()
 
+
+# TODO: /M:dw-sign/T:Use with caution;F::75/T:Use with caution;F::20/
+# Write the source code to the output png image in the text chunk
+
 img = memestr_to_img(memestr)
 img.save(os.path.join(os.getcwd(), args.outputfile))
