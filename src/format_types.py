@@ -2,10 +2,10 @@
 
 
 from PIL import ImageFont
-from defines import TagType
+from defines import TagType, DEFAULT_FONT_SIZE
 
 class Font:
-    def __init__(self, font_face='impact', font_size=40, outline_size=0, text_style='r'):
+    def __init__(self, font_face='impact', font_size=DEFAULT_FONT_SIZE, outline_size=0, text_style='r'):
         self.font_face = font_face
         self.font_size = font_size
         self.outline_size = outline_size

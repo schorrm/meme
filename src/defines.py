@@ -7,6 +7,7 @@ from enum import Enum, auto, unique
 # This file is meant for all the various global defaults and settings.
 
 DEFAULT_SIZE = (640, 480)
+DEFAULT_FONT_SIZE = 100
 
 SML_DIR = os.path.join(os.path.expanduser("~"), '.local', 'lib', 'meme', 'sml')
 LIB_DIR = os.path.join(os.path.expanduser("~"), '.local', 'lib', 'meme', 'libs')
