@@ -94,6 +94,9 @@ def split_long(phrases, pil_font, stroke_width, max_width):
     longest = max(lengths)
     while longest > max_width:
         idx = lengths.index(longest)
+        # TODO: Allow splitting in various places, not just on ' '.
+        if ' ' not in lines[idx]:
+            break
         split = list(_split(lines[idx]))
         lines = lines[:idx] + split + lines[idx+1:]
         lengths = lengths[:idx] + [pil_font.getsize(line, stroke_width=stroke_width)[0] for line in split] + lengths[idx+1:]
@@ -114,7 +117,7 @@ def optimize_text(text, font, max_width, max_height=None):
     while not success:
         success = True
         
-        text_size = pil_font.getsize_multiline(cur_text, )
+        text_size = pil_font.getsize_multiline(cur_text, stroke_width=stroke_width)
         if text_size[0] > max_width:
             phrases = split_long(phrases, pil_font, stroke_width, max_width)
             cur_text = '\n'.join(phrases[0])
