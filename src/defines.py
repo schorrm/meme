@@ -1,13 +1,15 @@
 #!/usr/bin/python3
 
+import os.path
+
 # We were worried about too much in utils, so we now have a separation.
 # This file is meant for all the various global defaults and settings.
 
 DEFAULT_SIZE = (640, 480)
 
-# TODO: come up with some bullshit to make this platform-independent
-SML_DIR = '/usr/local/lib/meme/sml'
-LIB_DIR = '/usr/local/lib/meme/lib'
+# TODO: come up with some bullshit to make this platform-independent. These good?
+SML_DIR = os.path.join(os.path.expanduser("~"), '.local', 'lib', 'meme', 'sml')
+LIB_DIR = os.path.join(os.path.expanduser("~"), '.local', 'lib', 'meme', 'libs')
 
 DEFAULT_FIELD_CFG = { "RIGHT"  : ("50%",  "0%", "100%", "100%"), # r1..rn
                       "LEFT"   : ( "0%",  "0%",  "50%", "100%"), # l1..ln
@@ -20,9 +22,10 @@ DEFAULT_FIELD_CFG = { "RIGHT"  : ("50%",  "0%", "100%", "100%"), # r1..rn
                       "ltop"   : ( "0%",  "0%",  "50%",  "20%"),
                       "lbottom": ( "0%", "80%",  "50%", "100%"),
                       "lcenter": ( "0%", "40%",  "50%",  "60%")
-                    } # TODO : DEFINE
+                    }
 DEFAULT_FIELD_ORDER = ("top", "bottom", "center", "rtop", "rbottom", "rcenter", "ltop", "lbottom", "lcenter")
 
-CONFIG_EXT = '.memeconfig' # My suggestion
+CONFIG_EXT = '.memeconfig' # My suggestion. I approve. Would still be neat to support embedding this stuff in JPEG EXIF fields / PNG Text chunks
 
 # TODO: PUT DEFAULT CONFIGS HERE
+# -> What additional configs are missing?
