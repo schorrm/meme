@@ -148,7 +148,7 @@ class Meme:
 
     def add_text(self, text_img: Image, position: BBox):
         ''' Draw text to a location '''
-        self.image.paste(text_image, position)
+        self.image.paste(text_img, position)
 
 
 class DrawingManager:
@@ -191,7 +191,7 @@ class DrawingManager:
 
         final_text, final_font, (final_width, final_height) = optimize_text(text, context.font, width, height)
         if context.current_color.background:
-            temp = Image.new("RGB", (width, height), color=context.current_color.background)
+            temp = Image.new("RGBA", (width, height), color=context.current_color.background)
         else:
             temp = Image.new("RGBA", (width, height), color=(0,0,0,0))
 
@@ -215,6 +215,12 @@ class DrawingManager:
         draw.multiline_text((x, y), final_text, fill=context.current_color.foreground, font=final_font,
                             align=halign, stroke_width=context.current_font.outline_size,
                             stroke_fill=context.current_color.outline)
-        # TODO: rotate temporary image
+        # if rotation != 0: # rotation is a fucking mess, v2.0
+        #     temp = temp.rotate(rotation, expand=True)
+        #     new_width, new_height = temp.getsize()
+        #     x = bbox[0] + (width - new_width)/2
+        #     y = bbox[1] + (height - new_height)/2
+        # else:
+        #     x, y, _, _ = bbox
         meme.add_text(temp, bbox) # paste to actual image
 
