@@ -87,16 +87,16 @@ def _split(text):
 
 def get_phrases(text, pil_font, stroke_width):
     lines = text.split('\n')
-    return [lines, [pil_font.getsize(line, stroke_width=stroke_width) for line in lines]]
+    return [lines, [pil_font.getsize(line, stroke_width=stroke_width)[0] for line in lines]]
 
 def split_long(phrases, pil_font, stroke_width, max_width):
     lines, lengths = phrases
     longest = max(lengths)
     while longest > max_width:
-        idx = lines.index(longest)
-        split = _split(lines[idx])
+        idx = lengths.index(longest)
+        split = list(_split(lines[idx]))
         lines = lines[:idx] + split + lines[idx+1:]
-        lengths = lengths[:idx] + [pil_font.getsize(line, stroke_width) for line in split] + lengths[idx+1:]
+        lengths = lengths[:idx] + [pil_font.getsize(line, stroke_width=stroke_width)[0] for line in split] + lengths[idx+1:]
         longest = max(lengths)
 
     return [lines, lengths]
@@ -106,7 +106,7 @@ def optimize_text(text, font, max_width, max_height=None):
     font_size = font.font_size
     # TODO: is this the correct value for stroke_width or does font_size also factor in somehow?
     stroke_width = font.outline_size or 0
-
+    
     cur_text = text
     phrases = get_phrases(text, pil_font, stroke_width)
 
@@ -130,4 +130,4 @@ def optimize_text(text, font, max_width, max_height=None):
             cur_text = text
             success = False
 
-    return text, pil_font, text_size
+    return cur_text, pil_font, text_size
