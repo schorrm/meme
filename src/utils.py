@@ -70,7 +70,6 @@ def resolve_file_path(image_handle: str):
         workingdir = SML_DIR
 
     segments = image_handle.split('.')
-    # TODO: ignore config files
     no_ex_pattern = os.path.join(workingdir, *segments) + '.*'
     last = segments.pop()
     ex_file = os.path.join(workingdir, *segments) + f'.{last}'
@@ -78,9 +77,10 @@ def resolve_file_path(image_handle: str):
         return ex_file
     else:
         gresults = glob.glob(no_ex_pattern)
-        if not gresults:
-            raise RuntimeError("Me looking for your image like")  # TODO: Have good errors
-        return gresults[0]
+        for path in gresults:
+            if not path.endswith(".memeconfig"):
+                return path
+        raise RuntimeError("Me looking for your image like")  # TODO: Have good errors
 
 def _split(text):
     """Split a line of text into two similarly sized pieces.
