@@ -35,6 +35,8 @@ class ConvertParseTree(Transformer):
         if not subtree:
             return Pop(TagType.FONT)
         font_name, font_size, outline_size = unpack3(subtree)
+        font_size = int(font_size) if font_size else None
+        outline_size = int(outline_size) if outline_size else None
         return Font(font_name, font_size, outline_size)
 
     def halign(self, halign):

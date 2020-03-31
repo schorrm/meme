@@ -46,7 +46,7 @@ valign: ":" HEIGHTAL
 COLUMN: "right" | "center" | "left" | "r" | "c" | "l" 
 HEIGHTAL:  "top" | "center" | "bottom" | "t" | "c" | "b"
 
-font: "F" (fontname (":" FONTSIZE)? (":" OUTLINESIZE)?)?
+font: "F" (fontname (":" FONTSIZE?)? (":" OUTLINESIZE)?)?
 
 fontname:  ":" CNAME?
 OUTLINESIZE: INT

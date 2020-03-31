@@ -61,13 +61,13 @@ class FormatManager:
         def pop_tag(self, tag):
             """ Handles a pop tag """
             # TODO: Better name for thing
-            if tag.data == TagType.FONT:
+            if tag == TagType.FONT:
                 thing = self.fonts
-            elif tag.data == TagType.ALIGNMENT:
+            elif tag == TagType.ALIGNMENT:
                 thing = self.aligns
-            elif tag.data == TagType.COLOR:
+            elif tag == TagType.COLOR:
                 thing = self.colors
-            elif tag.data == TagType.TEXTSTYLE:
+            elif tag == TagType.TEXTSTYLE:
                 thing = self.fonts
             else:
                 raise RuntimeError("Invalid pop tag data")

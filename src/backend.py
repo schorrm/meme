@@ -105,13 +105,11 @@ class Meme:
         return self.mode_generators[self.active_mode](self.active_index)
 
     def update_max_row(self, tag: LPText):
-        print('UPDATE', tag, tag.position)
         if type(tag.position) == str:
             if tag.position[1].isdigit():
                 row = int(tag.position[1:])
                 self.max_row = max(self.max_row, row)
-        print('max row', self.max_row)
-
+        
     def build_lookup_table(self):
         # make fields safe
         for k, v in self.fields.items():
@@ -119,8 +117,6 @@ class Meme:
         
         rleft, rtop, rright, rbottom = self.fields["RIGHT"]
         lleft, ltop, lright, lbottom = self.fields["LEFT"]
-
-        print(self.fields)
 
         rdelta = (rbottom - rtop) / self.max_row # this may need to be //
         ldelta = (lbottom - ltop) / self.max_row # this may need to be //
@@ -206,7 +202,6 @@ class DrawingManager:
 
 
         bbox = meme.resolve_position(position)
-        print(position, bbox)
         
         width = bbox[2] - bbox[0] # r - l
         height = bbox[3] - bbox[1] # if meme.has_height else None # b - t
@@ -224,22 +219,20 @@ class DrawingManager:
         valign = context.current_align.valign or "top"
         halign = context.current_align.halign or "center"
         if valign == "top":
-            x = 0
+            y = 0
         elif valign == "bottom":
-            x = height - final_height
+            y = height - final_height
         else:
-            x = (height-final_height)/2
+            y = (height-final_height)/2
 
         if halign == "left":
-            y = 0
+            x = 0
         elif halign == "right":
-            y = width - final_width
+            x = width - final_width
         else:
-            y = (width - final_width)/2
+            x = (width - final_width)/2
 
         draw = ImageDraw.Draw(temp, mode='RGBA')
-        print(final_font)
-        print(context.current_color)
         draw.text((x, y), final_text, fill=context.current_color.foreground, font=final_font,
                             align=halign, stroke_width=context.current_font.outline_size,
                             stroke_fill=context.current_color.outline)
