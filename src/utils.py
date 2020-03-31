@@ -134,6 +134,7 @@ def optimize_text(text, font, max_width, max_height):
         if text_size[0] > max_width:
             phrases = split_long(phrases, pil_font, max_length)
             cur_text = '\n'.join(phrases[0])
+            success = False
         
         if text_size[1] > max_height:
             font_size -= 1
@@ -142,5 +143,6 @@ def optimize_text(text, font, max_width, max_height):
             pil_font = pil_font.font_variant(size=font_size)
             phrases = get_phrases(text, pil_font)
             cur_text = text
+            success = False
 
-    return text, pil_font
+    return text, pil_font, text_size

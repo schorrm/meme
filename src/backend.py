@@ -119,7 +119,7 @@ class Meme:
             position = self.next_position
         elif type(position) == str: # this should be a named position, find appropriate tuple
             # allow auto position to work after l/r explicit position
-            if position[0] in "lr" and position[1].is_digit():
+            if position[0] in "lr" and position[1].is_digit(): # NOTE: lexer-parser MUST use "left" and "right"
                 self.active_mode = position[0]
                 self.update_index(int(position[1:]))
             elif position in self.field_order: # allow implicit following of general order
@@ -146,10 +146,9 @@ class Meme:
 
         return tuple(directions)
 
-    def add_text(self, text: str, font: ImageFont, bbox: BBox, rotation: float):
+    def add_text(self, text_img: Image, position: BBox):
         ''' Draw text to a location '''
-        # TODO: Figure out division of labor with DrawingManager.DrawText
-        pass
+        self.image.paste(text_image, position)
 
 
 class DrawingManager:
@@ -187,13 +186,35 @@ class DrawingManager:
         bbox = meme.resolve_position(position)
         width = bbox[2] - bbox[0] # r - l
         height = bbox[3] - bbox[1] # b - t
-        final_text, final_font = optimize_text(text, self.format_manager.current_font, width, height)
 
-        # TODO: find division of labor with Meme.add_text
-        # * Define temporary image with correct BG
-        # * render text to said image, with correct halign
-        # * redraw text with correct color
-        # * rotate temporary image
-        # * calculate paste position for proper valign
-        # * paste to actual image
+        context = get_current_format_context() # how does this work? don't care, resolve scoped tags with current context
+
+        final_text, final_font, (final_width, final_height) = optimize_text(text, context.font, width, height)
+        if context.current_color.background:
+            temp = Image.new("RGB", (width, height), color=context.current_color.background)
+        else:
+            temp = Image.new("RGBA", (width, height), color=(0,0,0,0))
+
+        valign = context.current_align.valign or "top"
+        halign = context.current_align.halign or "center"
+        if valign == "top":
+            x = 0
+        elif valign == "bottom":
+            x = height - final_height
+        else:
+            x = (height-final_height)/2
+
+        if halign == "left":
+            y = 0
+        elif halign == "right":
+            y = width - final_width
+        else:
+            y = (width - final_width)/2
+
+        draw = ImageDraw.Draw(temp)
+        draw.multiline_text((x, y), final_text, fill=context.current_color.foreground, font=final_font,
+                            align=halign, stroke_width=context.current_font.outline_size,
+                            stroke_fill=context.current_color.outline)
+        # TODO: rotate temporary image
+        meme.add_text(temp, bbox) # paste to actual image
 
