@@ -113,13 +113,13 @@ class StackManager:
                 else:
                     image = self.drawing_manager.DrawMeme(child.tag, child.scoped_tags, child.children) # TODO: exact call args
                     images.append(image)
-            
-        for idx in deferred.reverse():
+        
+        for idx in reversed(deferred):
             child = images[idx]
             child.tag.size[0] = images[idx+1].size[0]
             images[idx] = self.drawing_manager.DrawMeme(child.tag, child.scoped_tags, child.children) # TODO: exact call args
         
-        cols, rows = scope.tag.size
+        cols, rows = scope.tag.gridsize
         if rows is None:
             if cols is None:
                 raise SyntaxError("Only one of width and height can be auto")
@@ -127,19 +127,30 @@ class StackManager:
         elif cols is None:
             cols = ceil(len(images)/rows)
 
+        def idx2pair(idx):
+            return idx%cols, idx//cols
+
+        def pair2idx(c, r):
+            return c+(r*cols)
+        next_gridposition = 0
+
         grid = [[None]*cols for _ in range(rows)]
         for i in range(len(images)):
-            r, c = scope.children[i].position # TODO: check order of r, c
-            grid[c][r] = {"image":image, "tag": scope.children[i].tag}
+            r, c = scope.children[i].tag.gridposition or idx2pair(next_gridposition)# TODO: check order of r, c
+            next_gridposition = pair2idx(r, c)+1
+            grid[c][r] = {"image":images[i], "tag": scope.children[i].tag}
 
-        col_widths = [max(map(lambda r: grid[c][r]["image"], range(rows))) for c in range(cols)]
-        row_heights = [max(map(lambda c: grid[c][r]["image"], range(cols))) for r in range(rows)]
+        col_widths = [max(map(lambda r: grid[c][r]["image"].size[0], range(rows))) for c in range(cols)]
+        row_heights = [max(map(lambda c: grid[c][r]["image"].size[1], range(cols))) for r in range(rows)]
         
         positions = [[None]*cols for _ in range(rows)]
         # TODO: construct all the position variables
+        for r in range(rows):
+            for c in range(cols):
+                positions[r][c] = (sum(col_widths[:c]), sum(row_heights[:r]))
 
         base_image = Image.new("RGB", (sum(col_widths), sum(row_heights)), color='white')
-        draw = ImageDraw.Draw(base_image)
+        draw = ImageDraw.Draw(base_image, mode='RGBA')
 
         for c in range(cols):
             for r in range(rows):

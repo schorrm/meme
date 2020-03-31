@@ -8,7 +8,7 @@ from defines import TagType
 # * what happens if calling /END:TS/ after /F/ or vice versa? (Do we need a 4th Style object?)
 class FormatManager:
     class FormatContext:
-        def __init__(self, def_font=Font(), def_align=None, def_color=None):
+        def __init__(self, def_font=Font(), def_align=Alignment(), def_color=Color()):
             self.fonts = [def_font]
             self.aligns = [def_align]
             self.colors = [def_color]

@@ -1,7 +1,11 @@
+#!/usr/bin/python3
+
+
+from PIL import ImageFont
 from defines import TagType
 
 class Font:
-    def __init__(self, font_face='impact', font_size=14, outline_size=0, text_style='r'):
+    def __init__(self, font_face='impact', font_size=40, outline_size=0, text_style='r'):
         self.font_face = font_face
         self.font_size = font_size
         self.outline_size = outline_size
@@ -13,7 +17,7 @@ class Font:
     def PIL_font(self):
         """ Return PIL.ImageFont instance """
         if not self._cached_font:
-            pass
+            self._cached_font = ImageFont.truetype(font=self.font_face, size=self.font_size)
         return self._cached_font
 
     def inherit_from(self, update_font):
@@ -29,7 +33,7 @@ class Font:
 
 
 class Alignment:
-    def __init__(self, halign: str, valign: str):
+    def __init__(self, halign: str = 'center', valign: str = 'center'):
         self.halign = halign
         self.valign = valign
         self.type = TagType.ALIGNMENT

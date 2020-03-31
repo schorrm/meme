@@ -17,11 +17,12 @@ class Pop:
 
 
 class LPMeme:
-    def __init__(self, image: str = None, size=None, fillcolor='white', position=None):
+    def __init__(self, image: str = None, size=None, fillcolor='white', position=None, mode="resize"):
         self.image = image
         self.size = size or (None, None)
         self.fillcolor = fillcolor
         self.gridposition = position
+        self.mode = mode
         self.type = TagType.MEME
 
     def __repr__(self):

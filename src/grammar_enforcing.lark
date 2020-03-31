@@ -11,7 +11,7 @@ _layout_block: (textblock
             | endcomposite)
             
 textblock: "T" ":" (text) (":" position)? (":" rotation)?
-memeblock: "M" ((":" imagehandle?) (":" size?)? (":" fillcolor?)? (":" gridposition?)?)? //(":" gridposition?)?
+memeblock: "M" ((":" imagehandle?) (":" size?)? (":" fillcolor?)? (":" gridposition?)? (":" mode?)?)? //(":" gridposition?)?
 compositeblock: "C" (":" gridsize)? (":" gridposition)?
 whitespaceprefix: "WP:" text
 endcomposite: "END" // Perhaps: END: PARAM
@@ -20,6 +20,8 @@ fillcolor: COLOR
 size: INT "x" INT
 gridsize: INT "x" INT
 gridposition: INT "," INT
+mode: RESIZE_MODE
+RESIZE_MODE: "resize" | "crop" | "fill"
 
 text: VALID_BLOCK
 imagehandle: IMGH

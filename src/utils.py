@@ -87,7 +87,7 @@ def _split(text):
 
 def get_phrases(text, pil_font, stroke_width):
     lines = text.split('\n')
-    return [lines, [pil_font.getsize(line, stroke_width) for line in lines]]
+    return [lines, [pil_font.getsize(line, stroke_width=stroke_width) for line in lines]]
 
 def split_long(phrases, pil_font, stroke_width, max_width):
     lines, lengths = phrases

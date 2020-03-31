@@ -19,14 +19,15 @@ class Meme:
     _default_config = DEFAULT_FIELD_CFG
     _default_order = DEFAULT_FIELD_ORDER
 
-    def __init__(self, image_handle: str, size: Coordinates, fillcolor: str = '#fff', mode: str = "resize"):
+    def __init__(self, image_handle: str, size: Coordinates, fillcolor: str = 'white', mode: str = "resize"):
         ''' Create an Image to start drawing text on. '''
         if not image_handle:
-            image = Image.new('RGB', size, fillcolor)
+            image = Image.new('RGBA', size, fillcolor)
         else:
             file_path = resolve_file_path(image_handle)
             image = Image.open(file_path)
-            if size and image.size != size:
+            image = image.convert('RGBA')
+            if size[0] and size[1] and image.size != size:
                 
                 if mode == "resize":
                     if image.size[0]/size[0] != image.size[1]/size[1]:
@@ -35,7 +36,7 @@ class Meme:
                 elif mode == "crop":
                     image = image.crop(get_bbox(smaller=size, larger=image))
                 elif mode == "fill":
-                    image = Image.new('RGB', size, fillcolor).paste(image, get_bbox(smaller=image, larger=size))
+                    image = Image.new('RGBA', size, fillcolor).paste(image, get_bbox(smaller=image, larger=size))
                 else:
                     raise RuntimeError("Bad Mode")
 
@@ -51,6 +52,17 @@ class Meme:
     @property
     def height(self):
         return self.image.size[1]
+
+    def _convert_percentage_values(self, coords: BBox) -> BBox:
+        axes = [self.width, self.height, self.width, self.height]
+        coords = list(coords)
+        for i, (direction, max_value) in enumerate(zip(coords, axes)): # l t r b
+            if type(direction) == str and direction.endswith("%"): # TODO: NOTE: This may not come as percent, 
+                # we need to watch this, given that % is reserved
+                coords[i] = round((int(direction[:-1]) / 100) * max_value) # convert all % to pixel values
+
+        return tuple(coords)
+
     
     def load_config(self, file_path: str):
         self.fields = Meme._default_config.copy()
@@ -93,24 +105,32 @@ class Meme:
         return self.mode_generators[self.active_mode](self.active_index)
 
     def update_max_row(self, tag: LPText):
+        print('UPDATE', tag, tag.position)
         if type(tag.position) == str:
-            if tag.position[1].is_digit():
+            if tag.position[1].isdigit():
                 row = int(tag.position[1:])
                 self.max_row = max(self.max_row, row)
+        print('max row', self.max_row)
 
     def build_lookup_table(self):
+        # make fields safe
+        for k, v in self.fields.items():
+            self.fields[k] = self._convert_percentage_values(v)
+        
         rleft, rtop, rright, rbottom = self.fields["RIGHT"]
         lleft, ltop, lright, lbottom = self.fields["LEFT"]
 
-        rdelta = (rtop - rbottom) / self.max_row # this may need to be //
-        ldelta = (ltop - lbottom) / self.max_row # this may need to be //
+        print(self.fields)
+
+        rdelta = (rbottom - rtop) / self.max_row # this may need to be //
+        ldelta = (lbottom - ltop) / self.max_row # this may need to be //
 
         rbaseline = rtop
         lbaseline = ltop
 
         for i in range(1, self.max_row + 1):
-            self.fields[f'r{i}'] = (rleft, rbaseline, rright, rbaseline + rdelta)
-            self.fields[f'l{i}'] = (lleft, lbaseline, lright, lbaseline + ldelta)
+            self.fields[f'r{i}'] = (rleft, round(rbaseline), rright, round(rbaseline + rdelta))
+            self.fields[f'l{i}'] = (lleft, round(lbaseline), lright, round(lbaseline + ldelta))
             rbaseline += rdelta
             lbaseline += ldelta
 
@@ -121,7 +141,7 @@ class Meme:
             position = self.next_position
         elif type(position) == str: # this should be a named position, find appropriate tuple
             # allow auto position to work after l/r explicit position
-            if position[0] in "lr" and position[1].is_digit(): # NOTE: lexer-parser MUST use "left" and "right"
+            if position[0] in "lr" and position[1].isdigit(): # NOTE: lexer-parser MUST use "left" and "right"
                 self.active_mode = position[0]
                 self.update_index(int(position[1:]))
             elif position in self.field_order: # allow implicit following of general order
@@ -140,18 +160,11 @@ class Meme:
         self.update_index()
         
         # handle percentages
-        directions = list(position)
-        for direction, max_value in zip(directions, [self.width, self.height, self.width, self.height]): # l t r b
-            if direction.endswith("%"): # TODO: NOTE: This may not come as percent, 
-                                        #             we need to watch this, given that % is reserved
-                direction = round((int(direction[:-1]) / 100) * max_value) # convert all % to pixel values
-
-        return tuple(directions)
+        return self._convert_percentage_values(position)
 
     def add_text(self, text_img: Image, position: BBox):
         ''' Draw text to a location '''
-        self.image.paste(text_img, position)
-
+        self.image.paste(text_img, position, text_img)
 
 class DrawingManager:
     def __init__(self):
@@ -166,8 +179,8 @@ class DrawingManager:
         meme = Meme(tag.image, tag.size, tag.fillcolor, tag.mode)
 
         for tag in child_tags:
-            if type(tag) == LPText:
-                meme.update_max_row(tag)
+            if tag.type == TagType.TEXT:
+                meme.update_max_row(tag.tag)
 
         meme.build_lookup_table()
 
@@ -191,13 +204,16 @@ class DrawingManager:
         position = scope.tag.position
         #rotation = scope.tag.rotation
 
+
         bbox = meme.resolve_position(position)
+        print(position, bbox)
+        
         width = bbox[2] - bbox[0] # r - l
-        height = bbox[3] - bbox[1] if meme.has_height else None # b - t
+        height = bbox[3] - bbox[1] # if meme.has_height else None # b - t
 
         context = self.format_manager.scoped_context(scope.scoped_tags) # how does this work? don't care, resolve scoped tags with current context
 
-        final_text, final_font, (final_width, final_height) = optimize_text(text, context.font, width, height)
+        final_text, final_font, (final_width, final_height) = optimize_text(text, context.current_font, width, height)
         if height is None:
             height = final_height
         if context.current_color.background:
@@ -221,8 +237,10 @@ class DrawingManager:
         else:
             y = (width - final_width)/2
 
-        draw = ImageDraw.Draw(temp)
-        draw.multiline_text((x, y), final_text, fill=context.current_color.foreground, font=final_font,
+        draw = ImageDraw.Draw(temp, mode='RGBA')
+        print(final_font)
+        print(context.current_color)
+        draw.text((x, y), final_text, fill=context.current_color.foreground, font=final_font,
                             align=halign, stroke_width=context.current_font.outline_size,
                             stroke_fill=context.current_color.outline)
         # if rotation != 0: # rotation is a fucking mess, v2.0
