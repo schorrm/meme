@@ -89,7 +89,7 @@ class Meme:
             "r": 1,
             "l": 1
         }
-
+    
     @property
     def active_index(self):
         return self.mode_indices[self.active_mode]
@@ -106,16 +106,33 @@ class Meme:
         return self.mode_generators[self.active_mode](self.active_index)
 
     def update_max_row(self, tag: LPText):
-        if type(tag.position) == str:
-            if tag.position[1].isdigit():
-                row = int(tag.position[1:])
-                self.max_row = max(self.max_row, row)
+        do_update = True
+        position = tag.position
+        if position == None:
+            # Update always done by fallthrough, do_update just stops general->(r|l)n derailing
+            if self.active_mode == "general":
+                position = self.active_index # fallthrough to int case
+            else:
+                position = f'{self.active_mode}{self.active_index}'
 
-    def _update_max_row(self, tag: Union[Tuple, str]):
-        if type(tag) == str:
-            if tag[1].isdigit():
-                row = int(tag[1:])
+        # Following the default order
+        if type(position) == int:
+            self.active_mode = "general"
+            self.update_index(position)
+            position = self.field_order[self.active_index] # fallthrough if general order contains (r|l)n directives
+            do_update = False
+
+        # (r|l)n
+        if type(position) == str:
+            if position[0] in "rl" and position[1].isdigit():
+                row = int(position[1:])
                 self.max_row = max(self.max_row, row)
+                if do_update: # only override the current stuff if this isn't a fallthrough from the general ordering
+                    self.active_mode = position[0]
+                    self.update_index(row)
+
+        self.update_index() # advance to next position
+        
         
     def build_lookup_table(self):
 
@@ -139,6 +156,9 @@ class Meme:
             self.fields[f'l{i}'] = (lleft, round(lbaseline), lright, round(lbaseline + ldelta))
             rbaseline += rdelta
             lbaseline += ldelta
+
+        # Reset mode_indices for wet run
+        self.mode_indices = {"general": 0, "r": 1, "l": 1 }
 
     def resolve_position(self, position: Union[str, BBox, int, None]):
         if type(position) == int: # general position index -> tuple/named position
