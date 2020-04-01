@@ -6,7 +6,7 @@ from lark import Lark
 from transform_parse_tree import ConvertParseTree
 from stack_manager import StackManager
 import os
-from PIL import Image
+from PIL import Image, PngImagePlugin
 
 with open('grammar_enforcing.lark') as f:
     t = f.read()
@@ -25,8 +25,19 @@ parser = argparse.ArgumentParser("Standard Meme Compiler: v0.1")
 parser.add_argument('-s', '--string', help="Create from string")
 parser.add_argument('-f', '--loadfile', help="Load Standard Meme Representation from file")
 parser.add_argument('-o', '--outputfile', default="default.meme.png", help="Output filename")
+parser.add_argument('-e', '--extractinfo', help="Extract meme representation from a meme")
 
 args = parser.parse_args()
+
+if args.extractinfo:
+    img = Image.open(args.extractinfo)
+    data = img.info.get('memesource')
+    if not data:
+        print('Bad closed source meme')
+        exit(1)
+    else:
+        print(data)
+    exit(0)
 
 if not args.string or args.loadfile:
     raise RuntimeError("Y u no meme")
@@ -41,4 +52,8 @@ if not memestr:
 # Write the source code to the output png image in the text chunk
 
 img = memestr_to_img(memestr)
-img.save(os.path.join(os.getcwd(), args.outputfile))
+filename = os.path.join(os.getcwd(), args.outputfile)
+info = PngImagePlugin.PngInfo()
+info.add_text("memesource", memestr)
+
+img.save(filename, pnginfo=info)
