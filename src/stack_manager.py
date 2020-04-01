@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 
-import matplotlib.pyplot as plt
-
 from typing import List
 import warnings
 from format_types import Alignment, Color, Font, TextStyle
