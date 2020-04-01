@@ -14,12 +14,14 @@ You should now have access to `meme -h` (or `meme.exe -h`) from your terminal.
 
 ## Generating Memes
 The simplest memes can be generated from relavtively simple strings consisting of an image specifier and some text fields.</br>
-For example, `/M:drake/T:WYSIWYG/T:Entering weird crap into your console/` generates: ![](docs/example_drake.png)
+For example, `/M:drake/T:WYSIWYG/T:Entering weird crap into your console/` generates: <img src="docs/example_drake.png" height="50%" width="50%">
+
 The language also supports placing text at arbitary locations, changing text color, font size, etc:
 `/M:drake/T:WYSIWYG/T:Entering weird crap into your console/T:Green Text;CL:green;F:Arial:30/`
-![](docs/custom_drake.png)
+<img src="docs/custom_drake.png" height="50%" width="50%">
+
 It even handles memes with weird text positions for you, like with this pigeon meme:
-`/M:pigeon/T:Me/T:Meme Encoding Markup Expressions/T:Is this turing complete?/` (we're pretty sure its not) ![](docs/pigeon_custom_text_fields.png)
+`/M:pigeon/T:Me/T:Meme Encoding Markup Expressions/T:Is this turing complete?/` (we're pretty sure its not) <img src="docs/pigeon_custom_text_fields.png" height="50%" width="50%">
 
 ## Thanks
 Thank you to [Jace Browning](https://github.com/jacebrowning) for his [memegen](https://github.com/jacebrowning/memegen) website which inspired this project. Additionally, his code was a very helpful reference.</br>
