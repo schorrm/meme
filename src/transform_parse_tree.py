@@ -100,6 +100,9 @@ class ConvertParseTree(Transformer):
                 escape = False
             elif char == ESCAPE_CHAR:
                 escape = True
+            elif char == '_':
+                escape = False
+                processed_text += ' '
             else:
                 escape = False
                 processed_text += char
