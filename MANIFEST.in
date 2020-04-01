@@ -1,0 +1,3 @@
+include README.md
+include language_specs.md
+include src/grammar_enforcing.lark
