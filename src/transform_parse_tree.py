@@ -8,6 +8,15 @@ from defines import TagType
 from format_types import Font, Alignment, Color
 from layout_objects import LPMeme, LPText, LPComposite, LPWhitespacePrefix, Pop
 
+ESCAPE_CHAR = '~'
+
+escape_map = {
+    'n': '\n',
+    't': '\t',
+    '~': '~',
+    ':': ':'
+}
+
 import copy
 
 def _extract_monic(tree):
@@ -82,7 +91,20 @@ class ConvertParseTree(Transformer):
         return LPMeme(**tree)
 
     def text(self, token):
-        return {'text': _extract_monic(token)}
+        text = _extract_monic(token)
+        processed_text = ''
+        escape = False
+        for char in text:
+            if escape: # previous char was escaped
+                processed_text += escape_map[char]
+                escape = False
+            elif char == ESCAPE_CHAR:
+                escape = True
+            else:
+                escape = False
+                processed_text += char
+
+        return {'text': processed_text}
 
     def endcomposite(self, token):
         return Pop(TagType.COMPOSITE)

@@ -9,7 +9,7 @@ from enum import Enum, auto, unique
 DEFAULT_SIZE = (640, 480)
 DEFAULT_FONT_SIZE = 100
 
-OFFSET_WHITESPACE = 5
+OFFSET_WHITESPACE = 5 
 
 SML_DIR = os.path.join(os.path.expanduser("~"), '.local', 'lib', 'meme', 'sml')
 LIB_DIR = os.path.join(os.path.expanduser("~"), '.local', 'lib', 'meme', 'libs')
