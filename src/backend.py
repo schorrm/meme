@@ -12,6 +12,7 @@ import warnings
 import json
 
 from layout_objects import LPComposite, LPMeme, LPText, LPWhitespacePrefix
+from format_types import Font, Color, Alignment
 
 from PIL import Image, ImageDraw
 
@@ -69,13 +70,25 @@ class Meme:
         self.fields = Meme._default_config.copy()
         config_path = file_path + CONFIG_EXT
         self.field_order = Meme._default_order
+        self.default_format = []
         if os.path.exists(config_path):
             with open (config_path) as f:
                 field_data = json.load(f)
                 self.fields.update(field_data["namedFields"])
                 if field_data.get("defaultOrder"):
                     self.field_order = field_data["defaultOrder"]
+                format_data = field_data.get("format_data")
+                if format_data is not None:
+                    def _make_dict(name, args):
+                        d = {arg : None for arg in args}
+                        d.update(format_data.get(name, {}))
+                        return d
+
+                    self.default_format = [Font(**_make_dict("font", FONT_DATA)),
+                                           Alignment(**_make_dict("alignment", ALIGN_DATA)),
+                                           Color(**_make_dict("color", COLOR_DATA))]
         self.fields["all"] = ("0%", "0%", "100%", "100%") # this is defined here so that its a super untouchable reserved thingy
+
                 
         self.active_mode = 'general'
         self.mode_generators = {
@@ -219,10 +232,10 @@ class DrawingManager:
         
         
         ''' Draw a meme '''
-        self.format_manager.push_context(scoped_tags)
-        
         meme = Meme(tag.image, tag.size, tag.fillcolor, tag.mode)
 
+        self.format_manager.push_context(meme.default_format + scoped_tags)
+        
         for tag in child_tags:
             if tag.type == TagType.TEXT:
                 meme.update_max_row(tag.tag)

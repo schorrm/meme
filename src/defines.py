@@ -35,7 +35,9 @@ WP_DEFAULT_FONT = 'arial'
 WP_DEFAULT_FONTSIZE = 60
 WP_DEFAULT_OL_SIZE = 0
 
-
+FONT_DATA = ['font_face', 'font_size', 'outline_size', 'text_style']
+ALIGN_DATA = ['halign', 'valign']
+COLOR_DATA = ['foreground', 'background', 'outline']
 
 @unique
 class TagType(Enum):
