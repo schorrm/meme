@@ -26,8 +26,8 @@ RESIZE_MODE: "resize" | "crop" | "fill"
 text: VALID_BLOCK
 imagehandle: IMGH
 // local_image | library_image
-library_image: IMGH
-local_image: "." IMGH // TODO: maybe change this to some character that breaks URIs, like ^? 
+// library_image: IMGH
+// local_image: "." IMGH // TODO: maybe change this to some character that breaks URIs, like ^? 
 IMGH: ("-" | "_" | LETTER | DIGIT | ".")+
 
 _format_block: font
