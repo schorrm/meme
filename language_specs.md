@@ -7,6 +7,7 @@ A meme expression is formed from blocks. As of now there are three block hierarc
 - C: Composite (this contains memes)
 - M: Meme (denotes an image and its text)
 - T: Text (a text block)
+- WP: is a special case of Meme that puts white text before a meme (for image macros)
 
 Scoping is C -> M -> T.
 
@@ -25,3 +26,41 @@ Is properly encoded as:
 Where the termination of the M block is emplied by the end of the encoding.
 
 Each block has a base tag (either a style tag to modify the style or a scoping type such as C, M, or T). Colons `:` chain together arguments in `TAG:required:optional` order, and then `;` ends tag arguments. So `/T:WYSIWYG:r1;F:impact:20/` denotes a Text block (T), WYSIWYG being the text (mandatory), followed by font styling of impact, 20pt.
+
+## Reference of functions and args
+
+Layout Tags:
+
+- C: Composite 
+    - Gridsize = colsxrows e.g. "2x3"
+    - Gridlocation = col,row e.g. "1,2"
+
+- M: Meme
+    - Image (image is from the SML, local.image is from your current working directory)).
+    - Size (resizes from the automatic image default)
+    - Fillcolor
+    - Resize mode: this probably won't work, but the params are resize (default), crop, and fill. Good luck.
+- T: Text (a text block)
+    - Text
+    - Position is either:
+        - a named location (r or l or none followed by) (bottom, right, top)
+        - a column index like r3
+        - an explicit bounding box like 20,30,200,400 or 20%,20%,50%,50%
+    -e.g. `/T:foo:20,30,400,800/` or `/T:bar:rbottom/`
+- WP: Whitespace prefix (for text):
+    - Text (only param, you can still use `;` for scoped tags)
+
+Format Tags:
+
+- F: Font
+    - fontface
+    - fontsize
+    - outlinesize
+    - e.g. `/F:arial:20:5/`
+- CL: Color (takes both hex and valid color names)
+    - foreground
+    - background
+    - outline
+- AL: Align
+    - halign
+    - valign
