@@ -19,7 +19,7 @@ For example, the following meme:
 Is properly encoded as:
 
 ```meme
-/M:drake;F::60/T:WYSIWYG:r1/T:Entering weird crap into your console:r2/
+/M:drake/T:WYSIWYG/T:Entering weird crap into your console/
 ```
 
 Where the termination of the M block is emplied by the end of the encoding.
