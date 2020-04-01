@@ -23,6 +23,7 @@ class Meme:
         ''' Create an Image to start drawing text on. '''
         if not image_handle:
             image = Image.new('RGBA', size, fillcolor)
+            file_path = ''
         else:
             file_path = resolve_file_path(image_handle)
             image = Image.open(file_path)
@@ -165,6 +166,29 @@ class Meme:
 class DrawingManager:
     def __init__(self):
         self.format_manager = FormatManager()
+
+    def DrawTextMeme(self, tag: LPMeme, scoped_tags=[], child_tags=[]) -> Image:
+        self.format_manager.push_context(scoped_tags)
+        
+        text_tags = [tag for tag in child_tags if tag.type == TagType.TEXT]
+        if len(text_tags) != 1:
+            raise SyntaxError("Undefined Text Thingy")
+        text = text_tags[0]
+        context = self.format_manager.scoped_context(text.scoped_tags)
+        _,_, (_, new_height) = optimize_text(text.tag.text, context.current_font, tag.size[0]) # no max height, as high as we need
+        
+        tag.size = (tag.size[0], new_height + OFFSET_WHITESPACE)
+
+        meme = Meme(tag.image, tag.size, tag.fillcolor, tag.mode)
+        self.DrawText(meme, text)
+
+        # for tag_or_scope in child_tags:
+        #     if tag_or_scope.type == TagType.TEXT:
+        #     else:
+        #         raise SyntaxError("How did you even get a format tag here?")    
+        self.format_manager.pop_context()
+        return meme.image
+        
 
     def DrawMeme(self, tag: LPMeme, scoped_tags=[], child_tags=[]) -> Image:
         

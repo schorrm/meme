@@ -1,17 +1,21 @@
 #!/usr/bin/python3
 
+import matplotlib.pyplot as plt
+
 from typing import List
 import warnings
 from format_types import Alignment, Color, Font, TextStyle
 from layout_objects import LPComposite, LPMeme, LPText, LPWhitespacePrefix, Pop
 from backend import DrawingManager
 from utils import *
-from defines import TagType
+from defines import TagType, WP_DEFAULT_FONT, WP_DEFAULT_FONTSIZE, WP_DEFAULT_OL_SIZE
 from PIL import Image, ImageDraw
 from math import ceil
 
+
 def is_layout_obj(obj) -> bool:
     return type(obj) in [LPMeme, LPComposite, LPText, LPWhitespacePrefix]
+
 
 class Scope:
     def __init__(self, tag, scoped_tags=None):
@@ -27,6 +31,7 @@ class Scope:
                 s += f'\t{line}\n'
         s += '</Scope>'
         return s
+
 
 class StackManager:
     def __init__(self):
@@ -56,10 +61,10 @@ class StackManager:
         if len(self.scopes) > 0:
             self.current_scope.children.append(self._last_scope)
         else:
-            self.current_scope # this invokes the recovery code in the current_scope property
+            self.current_scope  # this invokes the recovery code in the current_scope property
 
     def add_scope(self, tag, scoped_tags):
-        # All 
+        # All
         if type(self.current_scope.tag) == LPMeme:
             self.pop_meme()
         self.scopes.append(Scope(tag, scoped_tags))
@@ -67,23 +72,24 @@ class StackManager:
     def parse(self, tag_list: List[List]) -> List:
 
         if type(tag_list[0][0]) != LPComposite:
-            self.scopes.append(Scope(tag=LPComposite(gridsize=(1,None))))
-            
+            self.scopes.append(Scope(tag=LPComposite(gridsize=(1, None))))
+
         self.lookaheads = 0
         for tag, *scoped_tags in tag_list:
-            if is_layout_obj(tag): # create new scope for layout object
+            if is_layout_obj(tag):  # create new scope for layout object
                 if type(tag) == LPText:
                     self.current_scope.children.append(Scope(tag, scoped_tags))
                 elif type(tag) == LPWhitespacePrefix:
                     # TODO: Figure out dependencies between auto and lookahead and also actually program them in somewhere (here vs backend?)
-                    self.add_scope(LPMeme(image=None, size=("lookahead", "auto"), fillcolor='white'), list())
-                    self.current_scope.children.append(Scope(LPText(tag.text), [Alignment("left", "top"), *scoped_tags]))
+                    self.add_scope(LPMeme(image=None, size=("lookahead", None), fillcolor='white'), list())
+                    self.current_scope.children.append(Scope(LPText(tag.text, position='all'), [Alignment("left", "top"), Font(
+                        WP_DEFAULT_FONT, WP_DEFAULT_FONTSIZE, WP_DEFAULT_OL_SIZE), *scoped_tags]))
                 elif type(tag) == LPMeme:
                     self.add_scope(tag, scoped_tags)
                 elif type(tag) == LPComposite:
                     pass
 
-            else: # format tags
+            else:  # format tags
                 if type(tag) == Pop:
                     if tag.type == TagType.MEME:
                         self.pop_meme()
@@ -100,9 +106,8 @@ class StackManager:
 
         while len(self.scopes) > 1:
             self.pop_composite()
-        
-        return self.current_scope
 
+        return self.current_scope
 
     def DrawStack(self, scope: Scope) -> Image:
         images = []
@@ -117,12 +122,12 @@ class StackManager:
                 else:
                     image = self.drawing_manager.DrawMeme(child.tag, child.scoped_tags, child.children)
                     images.append(image)
-        
+
         for idx in reversed(deferred):
             child = images[idx]
-            child.tag.size[0] = images[idx+1].size[0]
-            images[idx] = self.drawing_manager.DrawMeme(child.tag, child.scoped_tags, child.children)
-        
+            child.tag.size = (images[idx+1].size[0], child.tag.size[1]) # tuple doesn't support assignment
+            images[idx] = self.drawing_manager.DrawTextMeme(child.tag, child.scoped_tags, child.children)
+
         cols, rows = scope.tag.gridsize
         if rows is None:
             if cols is None:
@@ -132,26 +137,26 @@ class StackManager:
             cols = ceil(len(images)/rows)
 
         def idx2pair(idx):
-            return idx%cols, idx//cols
+            return idx % cols, idx//cols
 
         def pair2idx(c, r):
             return c+(r*cols)
         next_gridposition = 0
 
-        grid = [[None]*cols for _ in range(rows)]
+        grid = [[None]*rows for _ in range(cols)]
         for i in range(len(images)):
-            r, c = scope.children[i].tag.gridposition or idx2pair(next_gridposition)# TODO: check order of r, c
-            next_gridposition = pair2idx(r, c)+1
-            grid[c][r] = {"image":images[i], "tag": scope.children[i].tag}
+            c, r = scope.children[i].tag.gridposition or idx2pair(next_gridposition)  # TODO: check order of r, c
+            next_gridposition = pair2idx(c, r)+1
+            grid[c][r] = {"image": images[i], "tag": scope.children[i].tag}
 
         col_widths = [max(map(lambda r: grid[c][r]["image"].size[0], range(rows))) for c in range(cols)]
         row_heights = [max(map(lambda c: grid[c][r]["image"].size[1], range(cols))) for r in range(rows)]
-        
-        positions = [[None]*cols for _ in range(rows)]
-        
+
+        positions = [[None]*rows for _ in range(cols)]
+
         for r in range(rows):
             for c in range(cols):
-                positions[r][c] = (sum(col_widths[:c]), sum(row_heights[:r]))
+                positions[c][r] = (sum(col_widths[:c]), sum(row_heights[:r]))
 
         base_image = Image.new("RGB", (sum(col_widths), sum(row_heights)), color='white')
         draw = ImageDraw.Draw(base_image, mode='RGBA')
