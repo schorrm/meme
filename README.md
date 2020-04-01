@@ -7,7 +7,7 @@ This repository contains a references implementation of the compiler ([`src/cons
 ## Installation
 
 Setting up the compiler
-1. Run `python ./setup.py install` from the project root to install the compiler. 
+1. Run `pip install git+https://github.com/schorrm/meme.git`. Alternatively, clone and then run `python ./setup.py install` from the project root to install the compiler. 
 You should now have access to `meme -h` (or `meme.exe -h`) from your terminal.
 2. Clone the [FML (Foundational Meme Library)](https://github.com/schorrm/fml) to `~/.local/lib/meme/fml`
 3. Start memeing!
