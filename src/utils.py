@@ -42,11 +42,11 @@ def list2dict(l: List[dict]):
 
 def resolve_file_path(image_handle: str):
     # Resolve which directory we're looking at
-    if image_handle.startswith('..'):
-        workingdir = LIB_DIR
-        image_handle = image_handle[2:]
-    elif image_handle.startswith('.'):
+    if image_handle.startswith('local.'):
         workingdir = os.getcwd()
+        image_handle = image_handle.partition('.')[2]
+    elif image_handle.startswith('.'):
+        workingdir = LIB_DIR
         image_handle = image_handle[1:]
     else:
         workingdir = SML_DIR
