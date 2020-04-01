@@ -10,11 +10,11 @@ from layout_objects import LPMeme, LPText, LPComposite, LPWhitespacePrefix, Pop
 
 ESCAPE_CHAR = '~'
 
+import string
+string.printable
 escape_map = {
     'n': '\n',
-    't': '\t',
-    '~': '~',
-    ':': ':'
+    't': '\t'
 }
 
 import copy
@@ -96,7 +96,7 @@ class ConvertParseTree(Transformer):
         escape = False
         for char in text:
             if escape: # previous char was escaped
-                processed_text += escape_map[char]
+                processed_text += escape_map.get(char, char)
                 escape = False
             elif char == ESCAPE_CHAR:
                 escape = True
