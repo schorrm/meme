@@ -9,8 +9,8 @@ from typing import Dict
 
 class Pop:
     def __init__(self, tag: TagType):
-        self.type = TagType.POP
-        self.target = tag
+        self.type = tag #TagType.POP
+        # self.target = tag
 
     def __repr__(self):
         return f'<Pop {self.type}>'

@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-
 from PIL import ImageFont
 from defines import TagType, DEFAULT_FONT_SIZE
 
@@ -29,7 +28,7 @@ class Font:
         return self
 
     def __repr__(self):
-        return f'<{self.font_face} {self.font_size}{self.text_style}, {self.outline_size}>'
+        return f'<Font: {self.font_face} {self.font_size}{self.text_style}, {self.outline_size}>'
 
 
 class Alignment:

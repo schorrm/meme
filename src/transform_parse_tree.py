@@ -10,8 +10,6 @@ from layout_objects import LPMeme, LPText, LPComposite, LPWhitespacePrefix, Pop
 
 ESCAPE_CHAR = '~'
 
-import string
-string.printable
 escape_map = {
     'n': '\n',
     't': '\t'
@@ -80,7 +78,11 @@ class ConvertParseTree(Transformer):
 
     def gridposition(self, coords):
         x, y = coords
-        return {'position': (int(x), int(y))}
+        return {'gridposition': (int(x), int(y))}
+
+    def gridsize(self, coords):
+        x, y = coords
+        return {'gridsize': (int(x), int(y))}
 
     # Layout Blocks:
     def memeblock(self, tree):
@@ -108,6 +110,9 @@ class ConvertParseTree(Transformer):
                 processed_text += char
 
         return {'text': processed_text}
+
+    def compositeblock(self, tree):
+        return LPComposite(**list2dict(tree))
 
     def endcomposite(self, token):
         return Pop(TagType.COMPOSITE)

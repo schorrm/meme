@@ -40,7 +40,7 @@ class StackManager:
     @property
     def current_scope(self):
         if len(self.scopes) == 0:
-            warnings.warn("Trying to access non-existant scope. Attempting recovery", SyntaxWarning)
+            warnings.warn("Trying to access non-existent scope. Attempting recovery", SyntaxWarning)
             recovery_scope = Scope(tag=LPComposite(gridsize=(1, None)))
             recovery_scope.children.append(self._last_scope)
             self.scopes.append(recovery_scope)
