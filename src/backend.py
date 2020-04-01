@@ -74,7 +74,7 @@ class Meme:
         if os.path.exists(config_path):
             with open (config_path) as f:
                 field_data = json.load(f)
-                self.fields.update(field_data["namedFields"])
+                self.fields.update(field_data.get("namedFields", {}))
                 if field_data.get("defaultOrder"):
                     self.field_order = field_data["defaultOrder"]
                 format_data = field_data.get("format_data")
