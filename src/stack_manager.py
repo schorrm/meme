@@ -2,11 +2,11 @@
 
 from typing import List
 import warnings
-from format_types import Alignment, Color, Font, TextStyle
-from layout_objects import LPComposite, LPMeme, LPText, LPWhitespacePrefix, Pop
-from backend import DrawingManager
-from utils import *
-from defines import TagType, WP_DEFAULT_FONT, WP_DEFAULT_FONTSIZE, WP_DEFAULT_OL_SIZE
+from .format_types import Alignment, Color, Font, TextStyle
+from .layout_objects import LPComposite, LPMeme, LPText, LPWhitespacePrefix, Pop
+from .backend import DrawingManager
+from .utils import *
+from .defines import TagType, WP_DEFAULT_FONT, WP_DEFAULT_FONTSIZE, WP_DEFAULT_OL_SIZE
 from PIL import Image, ImageDraw
 from math import ceil
 

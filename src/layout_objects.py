@@ -3,8 +3,8 @@
 Class for intermediate layout objects
 '''
 
-from utils import get_image_size
-from defines import DEFAULT_SIZE, TagType
+from .utils import get_image_size
+from .defines import DEFAULT_SIZE, TagType
 from typing import Dict
 
 class Pop:

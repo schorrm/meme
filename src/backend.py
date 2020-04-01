@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 
 from typing import Union
-from utils import *
-from defines import *
-from format import FormatManager
+from .utils import *
+from .defines import *
+from .format import FormatManager
 
 import os
 import hashlib
@@ -11,8 +11,8 @@ from contextlib import suppress
 import warnings
 import json
 
-from layout_objects import LPComposite, LPMeme, LPText, LPWhitespacePrefix
-from format_types import Font, Color, Alignment
+from .layout_objects import LPComposite, LPMeme, LPText, LPWhitespacePrefix
+from .format_types import Font, Color, Alignment
 
 from PIL import Image, ImageDraw
 

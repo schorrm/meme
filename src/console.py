@@ -3,57 +3,61 @@
 import argparse
 
 from lark import Lark
-from transform_parse_tree import ConvertParseTree
-from stack_manager import StackManager
+from .transform_parse_tree import ConvertParseTree
+from .stack_manager import StackManager
 import os
 from PIL import Image, PngImagePlugin
 
-with open('grammar_enforcing.lark') as f:
-    t = f.read()
-l = Lark(t, parser='lalr')
+def main():
+    dirname = os.path.dirname(__file__)
+    filename = os.path.join(dirname, 'grammar_enforcing.lark')
 
-def memestr_to_img(memestr: str):
-    transformer = ConvertParseTree()
-    tl = transformer.transform(l.parse(memestr))
-    manager = StackManager()
-    processed_tree = manager.parse(tl)
-    img = manager.DrawStack(processed_tree)
-    return img
+    with open(filename) as f:
+        t = f.read()
+    l = Lark(t, parser='lalr')
 
-parser = argparse.ArgumentParser("Standard Meme Compiler: v0.1")
+    def memestr_to_img(memestr: str):
+        transformer = ConvertParseTree()
+        tl = transformer.transform(l.parse(memestr))
+        manager = StackManager()
+        processed_tree = manager.parse(tl)
+        img = manager.DrawStack(processed_tree)
+        return img
 
-parser.add_argument('-s', '--string', help="Create from string")
-parser.add_argument('-f', '--loadfile', help="Load Standard Meme Representation from file")
-parser.add_argument('-o', '--outputfile', default="default.meme.png", help="Output filename")
-parser.add_argument('-e', '--extractinfo', help="Extract meme representation from a meme")
+    parser = argparse.ArgumentParser("Standard Meme Compiler: v0.1")
 
-args = parser.parse_args()
+    parser.add_argument('-s', '--string', help="Create from string")
+    parser.add_argument('-f', '--loadfile', help="Load Standard Meme Representation from file")
+    parser.add_argument('-o', '--outputfile', default="default.meme.png", help="Output filename")
+    parser.add_argument('-e', '--extractinfo', help="Extract meme representation from a meme")
 
-if args.extractinfo:
-    img = Image.open(args.extractinfo)
-    data = img.info.get('memesource')
-    if not data:
-        print('Bad closed source meme')
-        exit(1)
-    else:
-        print(data)
-    exit(0)
+    args = parser.parse_args()
 
-if not args.string or args.loadfile:
-    raise RuntimeError("Y u no meme")
+    if args.extractinfo:
+        img = Image.open(args.extractinfo)
+        data = img.info.get('memesource')
+        if not data:
+            print('Bad closed source meme')
+            exit(1)
+        else:
+            print(data)
+        exit(0)
 
-memestr = args.string
-if not memestr:
-    with open(args.loadfile) as f:
-        memestr = f.read()
+    if not args.string or args.loadfile:
+        raise RuntimeError("Y u no meme")
+
+    memestr = args.string
+    if not memestr:
+        with open(args.loadfile) as f:
+            memestr = f.read()
 
 
-# TODO: /M:dw-sign/T:Use with caution;F::75/T:Use with caution;F::20/
-# Write the source code to the output png image in the text chunk
+    # TODO: /M:dw-sign/T:Use with caution;F::75/T:Use with caution;F::20/
+    # Write the source code to the output png image in the text chunk
 
-img = memestr_to_img(memestr)
-filename = os.path.join(os.getcwd(), args.outputfile)
-info = PngImagePlugin.PngInfo()
-info.add_text("memesource", memestr)
+    img = memestr_to_img(memestr)
+    filename = os.path.join(os.getcwd(), args.outputfile)
+    info = PngImagePlugin.PngInfo()
+    info.add_text("memesource", memestr)
 
-img.save(filename, pnginfo=info)
+    img.save(filename, pnginfo=info)

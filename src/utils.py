@@ -3,7 +3,7 @@
 import os
 import glob
 
-from defines import LIB_DIR, SML_DIR
+from .defines import LIB_DIR, SML_DIR
 
 from typing import Tuple, List, Union
 from enum import Enum, auto, unique

@@ -1,6 +1,6 @@
-from format_types import Font, Alignment, Color
+from .format_types import Font, Alignment, Color
 import warnings
-from defines import TagType
+from .defines import TagType
 
 # TODO: text style supported as 4th field on Font obj. How does text_style work?
 # * is /TS:style/ tag only shorthand for /F:::style/?

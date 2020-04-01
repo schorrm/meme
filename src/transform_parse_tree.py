@@ -2,11 +2,11 @@
 
 from lark import Lark, Transformer
 
-from utils import unpack, unpack3, list2dict
-from defines import TagType
+from .utils import unpack, unpack3, list2dict
+from .defines import TagType
 
-from format_types import Font, Alignment, Color
-from layout_objects import LPMeme, LPText, LPComposite, LPWhitespacePrefix, Pop
+from .format_types import Font, Alignment, Color
+from .layout_objects import LPMeme, LPText, LPComposite, LPWhitespacePrefix, Pop
 
 ESCAPE_CHAR = '~'
 
