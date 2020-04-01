@@ -3,7 +3,7 @@
 import os
 import glob
 
-from .defines import LIB_DIR, SML_DIR
+from .defines import LIB_DIR, FML_DIR
 
 from typing import Tuple, List, Union
 from enum import Enum, auto, unique
@@ -49,7 +49,7 @@ def resolve_file_path(image_handle: str):
         workingdir = LIB_DIR
         image_handle = image_handle[1:]
     else:
-        workingdir = SML_DIR
+        workingdir = FML_DIR
 
     segments = image_handle.split('.')
     no_ex_pattern = os.path.join(workingdir, *segments) + '.*'
@@ -62,6 +62,7 @@ def resolve_file_path(image_handle: str):
         for path in gresults:
             if not path.endswith(".memeconfig"):
                 return path
+        print("DEBUG", FML_DIR, image_handle)
         raise RuntimeError("Me looking for your image like")  # TODO: Have good errors
 
 def _split(text):

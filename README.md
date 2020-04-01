@@ -2,7 +2,15 @@
 Meme Encoding Markup Expressions - A grammar for generating memes.
 
 The full language spec can be found [here](./language_specs.md). </br>
-This repository contains a references implementation of the compiler ([`src/console.py`](./src/console.py))
+This repository contains a references implementation of the compiler ([`src/console.py`](./src/console.py))</br>
+
+## Installation
+
+Setting up the compiler
+1. Run `python ./setup.py install` from the project root to install the compiler. 
+You should now have access to `meme -h` (or `meme.exe -h`) from your terminal.
+2. Clone the [FML (Foundational Meme Library)](https://github.com/schorrm/fml) to `~/.local/lib/meme/fml`
+3. Start memeing!
 
 ## Generating Memes
 The simplest memes can be generated from relavtively simple strings consisting of an image specifier and some text fields.</br>

@@ -11,7 +11,7 @@ DEFAULT_FONT_SIZE = 100
 
 OFFSET_WHITESPACE = 5 
 
-SML_DIR = os.path.join(os.path.expanduser("~"), '.local', 'lib', 'meme', 'sml')
+FML_DIR = os.path.join(os.path.expanduser("~"), '.local', 'lib', 'meme', 'fml')
 LIB_DIR = os.path.join(os.path.expanduser("~"), '.local', 'lib', 'meme', 'libs')
 
 DEFAULT_FIELD_CFG = { "RIGHT"  : ("50%",  "0%", "100%", "100%"), # r1..rn
