@@ -133,11 +133,7 @@ class Meme:
 
         self.update_index() # advance to next position
         
-        
     def build_lookup_table(self):
-
-        for tag in self.field_order:
-            self._update_max_row(tag)
         # make fields safe
         for k, v in self.fields.items():
             self.fields[k] = self._convert_percentage_values(v)
