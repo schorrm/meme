@@ -10,7 +10,8 @@ setup(
     include_package_data=True,
     license='LICENSE',
     install_requires=[
-        'Pillow'
+        'Pillow',
+        'lark-parser'
     ],
     entry_points={
         'console_scripts': ['meme=src.console:main']
