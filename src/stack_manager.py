@@ -117,6 +117,7 @@ class StackManager:
     def DrawStack(self, scope: Scope) -> Image:
         images = []
         deferred = []
+        self.drawing_manager.format_manager.push_context(scope.scoped_tags)
         for i, child in enumerate(scope.children):
             if child.type == TagType.COMPOSITE:
                 images.append(self.DrawStack(child))
@@ -137,6 +138,8 @@ class StackManager:
             child = images[idx]
             child.tag.size = (images[idx+1].size[0], child.tag.size[1]) # tuple doesn't support assignment
             images[idx] = self.drawing_manager.DrawTextMeme(child.tag, child.scoped_tags, child.children)
+
+        self.drawing_manager.format_manager.pop_context()
 
         cols, rows = scope.tag.gridsize
         if rows is None:
