@@ -38,12 +38,19 @@ class StackManager:
         self.drawing_manager = DrawingManager()
 
     @property
+    def current_scope_tag(self):
+        if len(self.scopes):
+            return self.scopes[-1].tag
+        return None
+
+    @property
     def current_scope(self):
         if len(self.scopes) == 0:
-            warnings.warn("Trying to access non-existent scope. Attempting recovery", SyntaxWarning)
-            recovery_scope = Scope(tag=LPComposite(gridsize=(1, None)))
-            recovery_scope.children.append(self._last_scope)
-            self.scopes.append(recovery_scope)
+            raise SyntaxError("Cannot access nonexistent scope")
+        #     warnings.warn("Trying to access non-existent scope. Attempting recovery", SyntaxWarning)
+        #     recovery_scope = Scope(tag=LPComposite(gridsize=(1, None)))
+        #     recovery_scope.children.append(self._last_scope)
+        #     self.scopes.append(recovery_scope)
         return self.scopes[-1]
 
     def pop_meme(self):
@@ -53,22 +60,21 @@ class StackManager:
         self.current_scope.children.append(self._last_scope)
 
     def pop_composite(self):
-        while type(self.current_scope.tag) == LPMeme:
+        while type(self.current_scope_tag) == LPMeme:
             self.pop_meme()
         self._last_scope = self.scopes.pop()
         if len(self.scopes) > 0:
             self.current_scope.children.append(self._last_scope)
-        else:
-            self.current_scope  # this invokes the recovery code in the current_scope property
+        # else:
+            # self.current_scope  # this invokes the recovery code in the current_scope property
 
     def add_scope(self, tag, scoped_tags):
         # All
-        if type(self.current_scope.tag) == LPMeme:
+        if type(self.current_scope_tag) == LPMeme:
             self.pop_meme()
         self.scopes.append(Scope(tag, scoped_tags))
 
     def parse(self, tag_list: List[List]) -> List:
-
         if type(tag_list[0][0]) != LPComposite:
             self.scopes.append(Scope(tag=LPComposite(gridsize=(1, None))))
 
@@ -85,13 +91,13 @@ class StackManager:
                 elif type(tag) == LPMeme:
                     self.add_scope(tag, scoped_tags)
                 elif type(tag) == LPComposite:
-                    pass
-
+                    self.add_scope(tag, scoped_tags)
+                    
             else:  # format tags
-                if type(tag) == Pop:
-                    if tag.type == TagType.MEME:
+                if tag.type == TagType.POP:
+                    if tag.target == TagType.MEME:
                         self.pop_meme()
-                    if tag.type == TagType.COMPOSITE:
+                    elif tag.target == TagType.COMPOSITE:
                         self.pop_composite()
                     else:
                         self.current_scope.children.append(tag)
@@ -99,27 +105,33 @@ class StackManager:
                     self.current_scope.children.append(tag)
 
         # implictly popping the meme caused non-existant scope errors
-        if self.current_scope.type == TagType.MEME:
+        if self.current_scope_tag == TagType.MEME:
             self.pop_meme()
+
 
         while len(self.scopes) > 1:
             self.pop_composite()
 
-        return self.current_scope
+        return self._last_scope
 
     def DrawStack(self, scope: Scope) -> Image:
         images = []
         deferred = []
         for i, child in enumerate(scope.children):
-            if type(child.tag) == LPComposite:
+            if child.type == TagType.COMPOSITE:
                 images.append(self.DrawStack(child))
-            elif type(child.tag) == LPMeme:
+            elif child.type == TagType.MEME:
                 if child.tag.size[0] == "lookahead":
                     images.append(child)
                     deferred.append(i)
                 else:
                     image = self.drawing_manager.DrawMeme(child.tag, child.scoped_tags, child.children)
                     images.append(image)
+            elif child.type.is_format:
+                self.drawing_manager.format_manager.update_context(child)
+
+            elif child.type == TagType.POP and child.target.is_format:
+                self.drawing_manager.format_manager.pop_tag(child.target)
 
         for idx in reversed(deferred):
             child = images[idx]
