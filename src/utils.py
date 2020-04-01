@@ -118,7 +118,13 @@ def optimize_text(text, font, max_width, max_height=None):
         
         text_size = pil_font.getsize_multiline(cur_text, stroke_width=stroke_width)
         if text_size[0] > max_width:
-            phrases = split_long(phrases, pil_font, stroke_width, max_width)
+            _phrases = split_long(phrases, pil_font, stroke_width, max_width)
+            if _phrases == phrases: # splitting won't help
+                font_size -= 1 # TODO: Better alg for finding this. Given font sizes of ~100, this can be SLOOOOOW
+                if font_size == 0:
+                    raise RuntimeError("Too much text")
+                pil_font = pil_font.font_variant(size=font_size)
+            phrases = _phrases
             cur_text = '\n'.join(phrases[0])
             success = False
         
