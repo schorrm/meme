@@ -110,8 +110,17 @@ class Meme:
             if tag.position[1].isdigit():
                 row = int(tag.position[1:])
                 self.max_row = max(self.max_row, row)
+
+    def _update_max_row(self, tag: Union[Tuple, str]):
+        if type(tag) == str:
+            if tag[1].isdigit():
+                row = int(tag[1:])
+                self.max_row = max(self.max_row, row)
         
     def build_lookup_table(self):
+
+        for tag in self.field_order:
+            self._update_max_row(tag)
         # make fields safe
         for k, v in self.fields.items():
             self.fields[k] = self._convert_percentage_values(v)
