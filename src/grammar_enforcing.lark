@@ -10,7 +10,7 @@ _layout_block: (textblock
             | whitespaceprefix
             | endcomposite)
             
-textblock: "T" ":" (text) (":" position)? (":" rotation)?
+textblock: "T" ":" (text) (":" position)? //(":" rotation)?
 memeblock: "M" ((":" imagehandle?) (":" size?)? (":" fillcolor?)? (":" gridposition?)? (":" mode?)?)? //(":" gridposition?)?
 compositeblock: "C" (":" gridsize)? (":" gridposition)?
 whitespaceprefix: "WP:" text
@@ -21,6 +21,8 @@ size: INT "x" INT
 gridsize: INT "x" INT
 gridposition: INT "," INT
 mode: RESIZE_MODE
+bbox: SIZEDIR "," SIZEDIR "," SIZEDIR "," SIZEDIR
+
 RESIZE_MODE: "resize" | "crop" | "fill"
 
 text: VALID_BLOCK
@@ -44,7 +46,7 @@ align: "AL" (halign valign?)?
 halign: ":" COLUMN?
 valign: ":" HEIGHTAL
 COLUMN: "right" | "center" | "left" | "r" | "c" | "l" 
-HEIGHTAL:  "top" | "center" | "bottom" | "t" | "c" | "b"
+HEIGHTAL:  "top" | "center" | "bottom" | "t" | "c" | "b" | "rtop" | "rbottom" | "rcenter" | "ltop" | "lbottom"| "lcenter"
 
 font: "F" (fontname (":" FONTSIZE?)? (":" OUTLINESIZE)?)?
 
@@ -57,9 +59,8 @@ textstyle: "TS" (":" TEXSTYLEDIR*)?
 TEXSTYLEDIR: "b" | "u" | "s" | "i"
 
 rotation: SIGNED_NUMBER
-position: HEIGHTAL | INDEXCOL
-
-named_position: "top" | "bottom" | "center"
+position: position_indir | bbox
+position_indir: HEIGHTAL | INDEXCOL
 INDEXCOL: COLUMN INT
 
 instance: fun arg*

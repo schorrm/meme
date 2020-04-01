@@ -62,6 +62,8 @@ class Meme:
             if type(direction) == str and direction.endswith("%"): # TODO: NOTE: This may not come as percent, 
                 # we need to watch this, given that % is reserved
                 coords[i] = round((int(direction[:-1]) / 100) * max_value) # convert all % to pixel values
+            elif type(direction) == str:
+                coords[i] = int(direction)
 
         return tuple(coords)
 

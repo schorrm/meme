@@ -84,6 +84,9 @@ class ConvertParseTree(Transformer):
         x, y = coords
         return {'gridsize': (int(x), int(y))}
 
+    def bbox(self, coords):
+        return tuple(str(c) for c in coords)
+
     # Layout Blocks:
     def memeblock(self, tree):
         tree = list2dict(tree)
@@ -117,8 +120,11 @@ class ConvertParseTree(Transformer):
     def endcomposite(self, token):
         return Pop(TagType.COMPOSITE)
 
+    def position_indir(self, position):
+        return _extract_monic(position)
+
     def position(self, position):
-        return {'position': _extract_monic(position)}
+        return {'position': position[0]}
 
     def rotation(self, rotation):
         return {'rotation': _extract_monic(rotation)}
