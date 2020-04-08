@@ -30,6 +30,10 @@ def unpack(l: List, nullvalue=None):
     a, b, *_ = l + [nullvalue]
     return (a, b)
 
+def get_fml_memes() -> List[str]:
+    files = glob.glob(os.path.join(FML_DIR, '*'))
+    return [os.path.split(path)[-1] for path in files if not path.endswith(".memeconfig")]
+
 
 def unpack3(l: List, nullvalue=None):
     """ Unpacks a tuple / list of 1 or 2 items to 2, safely """

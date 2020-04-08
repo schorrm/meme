@@ -5,6 +5,7 @@ import argparse
 from lark import Lark
 from .transform_parse_tree import ConvertParseTree
 from .stack_manager import StackManager
+from .utils import get_fml_memes
 import os
 from PIL import Image, PngImagePlugin
 
@@ -30,8 +31,14 @@ def main():
     parser.add_argument('-f', '--loadfile', help="Load Standard Meme Representation from file")
     parser.add_argument('-o', '--outputfile', default="default.meme.png", help="Output filename")
     parser.add_argument('-e', '--extractinfo', help="Extract meme representation from a meme")
+    parser.add_argument('-l', '--listfml', action="store_true", help="List available FML memes")
 
     args = parser.parse_args()
+
+    if args.listfml:
+        for file in get_fml_memes():
+            print(file)
+        exit(0)
 
     if args.extractinfo:
         img = Image.open(args.extractinfo)
