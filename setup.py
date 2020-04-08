@@ -10,7 +10,7 @@ setup(
     include_package_data=True,
     license='LICENSE',
     install_requires=[
-        'Pillow',
+        'Pillow>=6.2.0',
         'lark-parser'
     ],
     entry_points={
