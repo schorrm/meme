@@ -118,13 +118,13 @@ class StackManager:
         images = []
         deferred = []
         self.drawing_manager.format_manager.push_context(scope.scoped_tags)
-        for i, child in enumerate(scope.children):
+        for child in scope.children:
             if child.type == TagType.COMPOSITE:
                 images.append(self.DrawStack(child))
             elif child.type == TagType.MEME:
                 if child.tag.size[0] == "lookahead":
+                    deferred.append(len(images))
                     images.append(child)
-                    deferred.append(i)
                 else:
                     image = self.drawing_manager.DrawMeme(child.tag, child.scoped_tags, child.children)
                     images.append(image)
