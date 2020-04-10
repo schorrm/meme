@@ -42,6 +42,22 @@ def install_fml():
     git.Repo.clone_from(FML_URL, FML_DIR)
     print('FML Installed')
 
+def update_fml():
+    try:
+        import git
+    except ImportError:
+        print('You need gitpython to update the FML. Try `pip install gitpython`')
+        exit(1)
+    
+    if not os.path.exists(FML_DIR):
+        print('FML not found.')
+        exit(1)
+
+    repo = git.Repo(FML_DIR)
+    print('Updating FML')
+    status = repo.remotes.origin.pull()[0]
+    print('Updated')
+
 def get_fml_memes() -> List[str]:
     files = glob.glob(os.path.join(FML_DIR, '*'))
     files = [os.path.split(path)[-1] for path in files if not path.endswith(".memeconfig")]
