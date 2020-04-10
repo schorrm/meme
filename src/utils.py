@@ -3,7 +3,7 @@
 import os
 import glob
 
-from .defines import LIB_DIR, FML_DIR
+from .defines import LIB_DIR, FML_DIR, FML_URL
 
 from typing import Tuple, List, Union
 from enum import Enum, auto, unique
@@ -30,9 +30,23 @@ def unpack(l: List, nullvalue=None):
     a, b, *_ = l + [nullvalue]
     return (a, b)
 
+def install_fml():
+    try:
+        import git
+    except ImportError:
+        print('You need gitpython to get the FML. Try `pip install gitpython`')
+        exit(1)
+    os.makedirs(FML_DIR, exist_ok=True)
+    print(f'Initialized FML at {FML_DIR}')
+    print('Cloning...')
+    git.Repo.clone_from(FML_URL, FML_DIR)
+    print('FML Installed')
+
 def get_fml_memes() -> List[str]:
     files = glob.glob(os.path.join(FML_DIR, '*'))
-    return [os.path.split(path)[-1] for path in files if not path.endswith(".memeconfig")]
+    files = [os.path.split(path)[-1] for path in files if not path.endswith(".memeconfig")]
+    files = [path for path in files if path not in ('LICENSE', 'README.md')]
+    return files
 
 
 def unpack3(l: List, nullvalue=None):

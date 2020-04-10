@@ -13,6 +13,7 @@ OFFSET_WHITESPACE = 5
 
 FML_DIR = os.path.join(os.path.expanduser("~"), '.local', 'lib', 'meme', 'fml')
 LIB_DIR = os.path.join(os.path.expanduser("~"), '.local', 'lib', 'meme', 'libs')
+FML_URL = "https://github.com/schorrm/fml.git"
 
 DEFAULT_FIELD_CFG = { "RIGHT"  : ("50%",  "0%", "100%", "100%"), # r1..rn
                       "LEFT"   : ( "0%",  "0%",  "50%", "100%"), # l1..ln
