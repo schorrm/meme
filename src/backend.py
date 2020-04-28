@@ -11,6 +11,8 @@ from contextlib import suppress
 import warnings
 import json
 
+from bidi.algorithm import get_display
+
 from .layout_objects import LPComposite, LPMeme, LPText, LPWhitespacePrefix
 from .format_types import Font, Color, Alignment
 
@@ -272,6 +274,7 @@ class DrawingManager:
         context = self.format_manager.scoped_context(scope.scoped_tags) # how does this work? don't care, resolve scoped tags with current context
 
         final_text, final_font, (final_width, final_height) = optimize_text(text, context.current_font, width, height)
+        final_text = get_display(final_text)
         if height is None:
             height = final_height
         if context.current_color.background:
