@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='meme',
-    version='0.1.0',
+    version='0.1.1',
     description='Standard Meme Compiler v. 0.1',
     author='Lior Ramati & Moshe Schorr',
     url='https://github.com/schorrm/meme',
