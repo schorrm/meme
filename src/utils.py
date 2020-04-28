@@ -58,6 +58,15 @@ def update_fml():
     status = repo.remotes.origin.pull()[0]
     print('Updated')
 
+def inspect_fml(meme: str):
+    files = glob.glob(os.path.join(FML_DIR, f'{meme}*.memeconfig'))
+    if not files:
+        print('Meme config not found')
+        return
+    file = files[0]
+    with open(file) as f:
+        print(f.read(), end='')
+
 def get_fml_memes() -> List[str]:
     files = glob.glob(os.path.join(FML_DIR, '*'))
     files = [os.path.split(path)[-1] for path in files if not path.endswith(".memeconfig")]
