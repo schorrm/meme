@@ -66,13 +66,13 @@ def main():
             print(data)
         exit(0)
 
-    if not args.string or args.loadfile:
+    if not (args.string or args.loadfile):
         raise RuntimeError("Y u no meme")
 
     memestr = args.string
     if not memestr:
         with open(args.loadfile) as f:
-            memestr = f.read()
+            memestr = f.read().strip()
 
 
     # TODO: /M:dw-sign/T:Use with caution;F::75/T:Use with caution;F::20/
