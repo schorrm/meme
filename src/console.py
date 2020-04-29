@@ -5,7 +5,7 @@ import argparse
 from lark import Lark
 from .transform_parse_tree import ConvertParseTree
 from .stack_manager import StackManager
-from .utils import get_fml_memes, install_fml, update_fml, inspect_fml
+from .utils import get_fml_memes, install_fml, update_fml, inspect_fml, view_fml
 from .image_to_clipboard import image_to_clipboard
 import os
 from PIL import Image, PngImagePlugin
@@ -35,7 +35,7 @@ def main():
     parser.add_argument('-p', '--preview', action="store_true", help="View resulting image without saving")
     parser.add_argument('-e', '--extractinfo', help="Extract meme representation from a meme")
     parser.add_argument('-l', '--listfml', action="store_true", help="List available FML memes")
-    parser.add_argument('-v', '--view-fml', action="store_true", help="View an FML meme")
+    parser.add_argument('-v', '--view-fml', help="View an FML meme")
     parser.add_argument('-i', '--inspectfml', help="View memeconfig for an fml meme")
     parser.add_argument('--getfml', action="store_true", help="Install the FML (Foundational Meme Library). Requires git.")
     parser.add_argument('--updatefml', action="store_true", help="Update the FML and make sure everything is dank and up to date. Requires git.")
@@ -57,6 +57,10 @@ def main():
 
     if args.inspectfml:
         inspect_fml(args.inspectfml)
+        exit(0)
+
+    if args.view_fml:
+        view_fml(args.view_fml)
         exit(0)
 
 

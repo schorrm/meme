@@ -5,6 +5,7 @@ import glob
 
 from .defines import LIB_DIR, FML_DIR, FML_URL
 
+from PIL import Image
 from typing import Tuple, List, Union
 from enum import Enum, auto, unique
 
@@ -66,6 +67,17 @@ def inspect_fml(meme: str):
     file = files[0]
     with open(file) as f:
         print(f.read(), end='')
+
+def view_fml(meme: str):
+    files = glob.glob(os.path.join(FML_DIR, f'{meme}*.png'))
+    files += glob.glob(os.path.join(FML_DIR, f'{meme}*.jpg'))
+    if not files:
+        print('Meme not found')
+        return
+    file = files[0]
+    im = Image.open(file)
+    im.show(title=file)
+    return
 
 def get_fml_memes() -> List[str]:
     files = glob.glob(os.path.join(FML_DIR, '*'))
