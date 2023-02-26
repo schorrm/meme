@@ -5,7 +5,9 @@ Class for intermediate layout objects
 
 from .utils import get_image_size
 from .defines import DEFAULT_SIZE, TagType
-from typing import Dict
+from typing import Any, Dict
+from dataclasses import dataclass
+
 
 class Pop:
     def __init__(self, tag: TagType):
@@ -16,37 +18,40 @@ class Pop:
         return f'<Pop {self.target}>'
 
 
+@dataclass
 class LPMeme:
-    def __init__(self, image: str = None, size=None, fillcolor='white', position=None, mode="resize"):
-        self.image = image
-        self.size = size or (None, None)
-        self.fillcolor = fillcolor
-        self.gridposition = position
-        self.mode = mode
-        self.type = TagType.MEME
+    image: str | None = None
+    size: tuple[int | None, int | None] = (None, None)
+    fillcolor: str = 'white'
+    position: str | None = None
+    mode: str = "resize"
+    type: TagType = TagType.MEME
 
     def __repr__(self):
         coords = f'({self.size[0]}x{self.size[1]})' if self.size else f'(?x?)'
         return f'<Meme: {self.image} {coords} @{self.gridposition}>'
 
+
+@dataclass
 class LPText:
-    def __init__(self, text, position=None, rotation=0):
-        self.text = text
-        self.position = position
-        self.rotation = rotation
-        self.type = TagType.TEXT
+    text: str
+    position: str | None = None
+    rotation: int = 0
+    type: TagType = TagType.TEXT
 
     def __repr__(self):
         return f'<Text "{self.text}" @{self.position}>'
 
+
+@dataclass
 class LPComposite:
-    def __init__(self, gridsize=None, gridposition=None):
-        self.gridsize = gridsize
-        self.gridposition = gridposition
-        self.type = TagType.COMPOSITE
+    gridsize: Any | None = None  # TODO(schorrm): fix with correct types
+    gridposition: Any | None = None  # TODO(schorrm): fix with correct type
+    type: TagType | None = TagType.COMPOSITE
 
     def __repr__(self):
         return f'<LPComposite: {self.gridsize} @{self.gridposition}>'
+
 
 class LPWhitespacePrefix:
     def __init__(self, text):
