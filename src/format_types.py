@@ -14,7 +14,7 @@ def _STATIC(tag: TagType) -> TagType:
 class Font:
     font_face: str = 'Impact'
     font_size: int = DEFAULT_FONT_SIZE
-    outline_size: int = 0
+    outline_size: int = 2
     text_style: str = 'r'
     type: TagType = _STATIC(TagType.FONT)
     _cached_font: FreeTypeFont | None = field(init=False, default=None)
@@ -73,6 +73,13 @@ class Color:
 
     def __repr__(self):
         return f'<Color: FG={self.foreground}, BG={self.background}, OL={self.outline}>'
+
+
+@dataclass
+class Time:
+    frames: tuple[int | None, int | None] | None = None
+    seconds: tuple[float | None, float | None] | None = None
+    type: TagType = _STATIC(TagType.TIME)
 
 
 # TODO: Support text style -- we need to figure a lot of other details here, may need tweaks

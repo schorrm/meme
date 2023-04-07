@@ -36,6 +36,7 @@ _format_block: font
             | textstyle
             | colorblock
             | align
+            | time
 
 colorblock: "CL" (colorarg) ~ 0..3
 colorarg: ":" COLOR?
@@ -47,6 +48,14 @@ halign: ":" COLUMN?
 valign: ":" HEIGHTAL
 COLUMN: "right" | "center" | "left" | "r" | "c" | "l" 
 HEIGHTAL:  "top" | "center" | "bottom" | "t" | "c" | "b" | "rtop" | "rbottom" | "rcenter" | "ltop" | "lbottom"| "lcenter"
+
+time: "TIME" ":" (secondsdirective | framesdirective)
+secondsdirective: range
+framesdirective: "f" range
+range: closed | less_than | at_least
+closed: DEC_OR_INT "-" DEC_OR_INT
+less_than: "-" DEC_OR_INT
+at_least: DEC_OR_INT "-"
 
 font: "F" (fontname (":" FONTSIZE?)? (":" OUTLINESIZE)?)?
 
@@ -73,10 +82,13 @@ _ESCAPE_SAFE: /(.+?)(?<!~)(~~)*?(?=[\/:;])/ //
 VALID_BLOCK: _TILDE_SOLVE | _ESCAPE_SAFE // Order here is crucial for some reason
 // _TILDE_SOLVE:  /(~~)+?(?=[\/:])/
 
+DEC_OR_INT: INT | DECIMAL
+
 %import common.CNAME
 %import common.LETTER
 %import common.DIGIT
 %import common.HEXDIGIT
+%import common.DECIMAL
 %import common.SIGNED_NUMBER
 %import common.INT
 %import common.ESCAPED_STRING

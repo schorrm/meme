@@ -1,4 +1,4 @@
-from .format_types import Font, Alignment, Color
+from .format_types import Font, Alignment, Color, Time
 import warnings
 from .defines import TagType
 
@@ -10,10 +10,11 @@ from .defines import TagType
 
 class FormatManager:
     class FormatContext:
-        def __init__(self, def_font=Font(), def_align=Alignment(), def_color=Color()):
+        def __init__(self, def_font=Font(), def_align=Alignment(), def_color=Color(), def_time=Time()):
             self.fonts = [def_font]
             self.aligns = [def_align]
             self.colors = [def_color]
+            self.times = [def_time]
 
         @property
         def current_font(self):
@@ -30,6 +31,10 @@ class FormatManager:
         @property
         def current_format(self):
             return (self.current_font, self.current_align, self.current_color)
+
+        @property
+        def current_time(self) -> Time:
+            return self.times[-1]
 
         def F_tag(self, font):
             self.fonts.append(font.inherit_from(self.current_font))
@@ -56,6 +61,8 @@ class FormatManager:
                 warnings.warn(
                     "Got POP tag in update_context(). pop_tag() should be called explicitly", SyntaxWarning)
                 self.pop_tag(tag)
+            elif tag.type == TagType.TIME:
+                self.times.append(tag)
             else:
                 # TODO: Usefuller error messages. Own error type(s)?
                 raise RuntimeError("Got bad tag type")
@@ -69,6 +76,8 @@ class FormatManager:
                     target_array = self.aligns
                 case TagType.COLOR:
                     target_array = self.colors
+                case TagType.TIME:
+                    target_array = self.times
                 case _:
                     raise RuntimeError("Invalid pop tag data")
 
@@ -81,6 +90,7 @@ class FormatManager:
             self.fonts = [self.current_font]
             self.aligns = [self.current_align]
             self.colors = [self.current_color]
+            self.times = [self.current_time]
 
     @property
     def _current_context(self):
@@ -88,6 +98,10 @@ class FormatManager:
 
     def __init__(self):
         self.contexts = [FormatManager.FormatContext()]
+
+    def contains_frame(self, frame_number: int) -> bool:
+        start_frame, end_frame = self._current_context.current_time.frames
+        return start_frame <= frame_number <= end_frame
 
     def push_context(self, scoped_tags):
         """ Adds a new context (Container or Meme) to the stack """
