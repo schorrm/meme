@@ -106,6 +106,8 @@ def main():
 
     elif img.is_animated:
         filename = os.path.join(os.getcwd(), args.outputfile)
+        if filename.endswith('.png'):
+            filename = filename.removesuffix('.png') + '.gif'
         info = img.info
         info['comment'] = f'memesource: {memestr}'
         img.save(filename, save_all=True)

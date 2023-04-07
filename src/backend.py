@@ -10,6 +10,8 @@ import hashlib
 from contextlib import suppress
 import warnings
 import json
+from io import BytesIO
+
 
 from bidi.algorithm import get_display
 
@@ -320,9 +322,10 @@ class DrawingManager:
             frames = meme.generate_gif()
             base = frames[0]
             base.info = meme.image.info
-            base.save('_tmp_gen.gif', save_all=True,
+            stream = BytesIO()
+            base.save(stream, format='gif', save_all=True,
                       append_images=frames[1:])
-            im = Image.open('_tmp_gen.gif')
+            im = Image.open(stream)
             return im
 
         else:
