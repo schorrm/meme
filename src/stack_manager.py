@@ -15,6 +15,14 @@ def is_layout_obj(obj) -> bool:
     return type(obj) in [LPMeme, LPComposite, LPText, LPWhitespacePrefix]
 
 
+# def get_grid_position(obj) -> Any | None:
+#     match obj:
+#         case LPComposite():
+#             return obj.gridposition
+#         case _:
+#             return None
+
+
 class Scope:
     def __init__(self, tag, scoped_tags=None):
         self.tag = tag
@@ -81,33 +89,30 @@ class StackManager:
         self.lookaheads = 0
         for tag, *scoped_tags in tag_list:
             if is_layout_obj(tag):  # create new scope for layout object
-                if type(tag) == LPText:
-                    self.current_scope.children.append(Scope(tag, scoped_tags))
-                elif type(tag) == LPWhitespacePrefix:
-                    # TODO: Figure out dependencies between auto and lookahead and also actually program them in somewhere (here vs backend?)
-                    self.add_scope(LPMeme(image=None, size=("lookahead", None), fillcolor='white'), list())
-                    self.current_scope.children.append(Scope(LPText(tag.text, position='all'), [Alignment("left", "top"), Font(
-                        WP_DEFAULT_FONT, WP_DEFAULT_FONTSIZE, WP_DEFAULT_OL_SIZE), *scoped_tags]))
-                elif type(tag) == LPMeme:
-                    self.add_scope(tag, scoped_tags)
-                elif type(tag) == LPComposite:
-                    self.add_scope(tag, scoped_tags)
-                    
+                match tag:
+                    case LPText():
+                        self.current_scope.children.append(
+                            Scope(tag, scoped_tags))
+                    case LPWhitespacePrefix():
+                        self.add_scope(LPMeme(image=None, size=(
+                            "lookahead", None), fillcolor='white'), list())
+                        self.current_scope.children.append(Scope(LPText(tag.text, position='all'), [Alignment("left", "top"), Font(
+                            WP_DEFAULT_FONT, WP_DEFAULT_FONTSIZE, WP_DEFAULT_OL_SIZE), *scoped_tags]))
+                    case LPMeme() | LPComposite():
+                        self.add_scope(tag, scoped_tags)
+
             else:  # format tags
-                if tag.type == TagType.POP:
-                    if tag.target == TagType.MEME:
+                match tag:
+                    case Pop(target=TagType.MEME):
                         self.pop_meme()
-                    elif tag.target == TagType.COMPOSITE:
+                    case Pop(target=TagType.COMPOSITE):
                         self.pop_composite()
-                    else:
+                    case _:
                         self.current_scope.children.append(tag)
-                else:
-                    self.current_scope.children.append(tag)
 
         # implictly popping the meme caused non-existant scope errors
         if self.current_scope_tag == TagType.MEME:
             self.pop_meme()
-
 
         while len(self.scopes) > 1:
             self.pop_composite()
@@ -126,7 +131,8 @@ class StackManager:
                     deferred.append(len(images))
                     images.append(child)
                 else:
-                    image = self.drawing_manager.DrawMeme(child.tag, child.scoped_tags, child.children)
+                    image = self.drawing_manager.DrawMeme(
+                        child.tag, child.scoped_tags, child.children)
                     images.append(image)
             elif child.type.is_format:
                 self.drawing_manager.format_manager.update_context(child)
@@ -136,8 +142,10 @@ class StackManager:
 
         for idx in reversed(deferred):
             child = images[idx]
-            child.tag.size = (images[idx+1].size[0], child.tag.size[1]) # tuple doesn't support assignment
-            images[idx] = self.drawing_manager.DrawTextMeme(child.tag, child.scoped_tags, child.children)
+            # tuple doesn't support assignment
+            child.tag.size = (images[idx+1].size[0], child.tag.size[1])
+            images[idx] = self.drawing_manager.DrawTextMeme(
+                child.tag, child.scoped_tags, child.children)
 
         self.drawing_manager.format_manager.pop_context()
 
@@ -158,12 +166,15 @@ class StackManager:
 
         grid = [[None]*rows for _ in range(cols)]
         for i in range(len(images)):
-            c, r = scope.children[i].tag.gridposition or idx2pair(next_gridposition)  # TODO: check order of r, c
+            c, r = scope.children[i].tag.gridposition or idx2pair(
+                next_gridposition)  # TODO: check order of r, c
             next_gridposition = pair2idx(c, r)+1
             grid[c][r] = {"image": images[i], "tag": scope.children[i].tag}
 
-        col_widths = [max(map(lambda r: grid[c][r]["image"].size[0], range(rows))) for c in range(cols)]
-        row_heights = [max(map(lambda c: grid[c][r]["image"].size[1], range(cols))) for r in range(rows)]
+        col_widths = [
+            max(map(lambda r: grid[c][r]["image"].size[0], range(rows))) for c in range(cols)]
+        row_heights = [
+            max(map(lambda c: grid[c][r]["image"].size[1], range(cols))) for r in range(rows)]
 
         positions = [[None]*rows for _ in range(cols)]
 
@@ -171,7 +182,8 @@ class StackManager:
             for c in range(cols):
                 positions[c][r] = (sum(col_widths[:c]), sum(row_heights[:r]))
 
-        base_image = Image.new("RGB", (sum(col_widths), sum(row_heights)), color='white')
+        base_image = Image.new(
+            "RGB", (sum(col_widths), sum(row_heights)), color='white')
         draw = ImageDraw.Draw(base_image, mode='RGBA')
 
         for c in range(cols):
@@ -182,7 +194,8 @@ class StackManager:
                 fill = 'white'
                 if type(tag) == LPMeme and tag.fillcolor:
                     fill = tag.fillcolor
-                draw.rectangle(((x, y), (x+col_widths[c], y+row_heights[r])), fill)
+                draw.rectangle(
+                    ((x, y), (x+col_widths[c], y+row_heights[r])), fill)
                 base_image.paste(grid[c][r]["image"], positions[c][r])
 
         return base_image

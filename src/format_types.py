@@ -3,8 +3,9 @@
 from PIL import ImageFont
 from .defines import TagType, DEFAULT_FONT_SIZE
 
+
 class Font:
-    def __init__(self, font_face='impact', font_size=DEFAULT_FONT_SIZE, outline_size=0, text_style='r'):
+    def __init__(self, font_face='Impact', font_size=DEFAULT_FONT_SIZE, outline_size=0, text_style='r'):
         self.font_face = font_face
         self.font_size = font_size
         self.outline_size = outline_size
@@ -16,11 +17,15 @@ class Font:
     def PIL_font(self):
         """ Return PIL.ImageFont instance """
         if not self._cached_font:
-            self._cached_font = ImageFont.truetype(font=self.font_face, size=self.font_size)
+            try:
+                self._cached_font = ImageFont.truetype(
+                    font=self.font_face, size=self.font_size)
+            except OSError:
+                raise RuntimeError(f"Couldn't find font {self.font_face}")
         return self._cached_font
 
     def inherit_from(self, update_font):
-        if self.outline_size == None: # Zero is a size, none is not
+        if self.outline_size == None:  # Zero is a size, none is not
             self.outline_size = update_font.outline_size
         self.font_size = self.font_size or update_font.font_size
         self.font_face = self.font_face or update_font.font_face

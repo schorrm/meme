@@ -24,6 +24,7 @@ class LPMeme:
     size: tuple[int | None, int | None] = (None, None)
     fillcolor: str = 'white'
     position: str | None = None
+    gridposition: str | None = position
     mode: str = "resize"
     type: TagType = TagType.MEME
 
