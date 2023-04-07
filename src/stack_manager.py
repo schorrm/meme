@@ -88,27 +88,23 @@ class StackManager:
 
         self.lookaheads = 0
         for tag, *scoped_tags in tag_list:
-            if is_layout_obj(tag):  # create new scope for layout object
-                match tag:
-                    case LPText():
-                        self.current_scope.children.append(
-                            Scope(tag, scoped_tags))
-                    case LPWhitespacePrefix():
-                        self.add_scope(LPMeme(image=None, size=(
-                            "lookahead", None), fillcolor='white'), list())
-                        self.current_scope.children.append(Scope(LPText(tag.text, position='all'), [Alignment("left", "top"), Font(
-                            WP_DEFAULT_FONT, WP_DEFAULT_FONTSIZE, WP_DEFAULT_OL_SIZE), *scoped_tags]))
-                    case LPMeme() | LPComposite():
-                        self.add_scope(tag, scoped_tags)
-
-            else:  # format tags
-                match tag:
-                    case Pop(target=TagType.MEME):
-                        self.pop_meme()
-                    case Pop(target=TagType.COMPOSITE):
-                        self.pop_composite()
-                    case _:
-                        self.current_scope.children.append(tag)
+            match tag:
+                case LPText():
+                    self.current_scope.children.append(
+                        Scope(tag, scoped_tags))
+                case LPWhitespacePrefix():
+                    self.add_scope(LPMeme(image=None, size=(
+                        "lookahead", None), fillcolor='white'), list())
+                    self.current_scope.children.append(Scope(LPText(tag.text, position='all'), [Alignment("left", "top"), Font(
+                        WP_DEFAULT_FONT, WP_DEFAULT_FONTSIZE, WP_DEFAULT_OL_SIZE), *scoped_tags]))
+                case LPMeme() | LPComposite():
+                    self.add_scope(tag, scoped_tags)
+                case Pop(target=TagType.MEME):
+                    self.pop_meme()
+                case Pop(target=TagType.COMPOSITE):
+                    self.pop_composite()
+                case _:
+                    self.current_scope.children.append(tag)
 
         # implictly popping the meme caused non-existant scope errors
         if self.current_scope_tag == TagType.MEME:

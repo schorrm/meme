@@ -9,17 +9,22 @@ from typing import Any, Dict
 from dataclasses import dataclass
 
 
-class Pop:
-    def __init__(self, tag: TagType):
-        self.type = TagType.POP
-        self.target = tag
+# Represents the interface for grouping the structural objects
+class LPTag:
+    pass
+
+
+@dataclass
+class Pop(LPTag):
+    target: TagType
+    type: TagType = TagType.POP
 
     def __repr__(self):
         return f'<Pop {self.target}>'
 
 
 @dataclass
-class LPMeme:
+class LPMeme(LPTag):
     image: str | None = None
     size: tuple[int | None, int | None] = (None, None)
     fillcolor: str = 'white'
@@ -34,7 +39,7 @@ class LPMeme:
 
 
 @dataclass
-class LPText:
+class LPText(LPTag):
     text: str
     position: str | None = None
     rotation: int = 0
@@ -45,7 +50,7 @@ class LPText:
 
 
 @dataclass
-class LPComposite:
+class LPComposite(LPTag):
     gridsize: Any | None = None  # TODO(schorrm): fix with correct types
     gridposition: Any | None = None  # TODO(schorrm): fix with correct type
     type: TagType | None = TagType.COMPOSITE
@@ -54,21 +59,10 @@ class LPComposite:
         return f'<LPComposite: {self.gridsize} @{self.gridposition}>'
 
 
-class LPWhitespacePrefix:
-    def __init__(self, text):
-        self.text = text
-        self.type = TagType.WHITESPACE
+@dataclass
+class LPWhitespacePrefix(LPTag):
+    text: str
+    type: TagType = TagType.WHITESPACE
 
     def __repr__(self):
         return f'<WP: {self.text}>'
-
-# class LPOutput:
-#     def __init__(self, tagtype: TagType, data: Dict):
-#         self.type = tagtype
-#         self.data = data
-
-#     def __getattr__(self, attr):
-#         if attr in self.data.keys():
-#             return self.data[attr]
-#         else:
-#             raise ???
