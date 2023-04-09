@@ -26,10 +26,10 @@ class Pop(LPTag):
 @dataclass
 class LPMeme(LPTag):
     image: str | None = None
-    size: tuple[int | None, int | None] = (None, None)
+    # note: under the hood, `/WP:/`` adds an LPMeme with size=('lookahead', None)
+    size: tuple[int | str | None, int | None] = (None, None)
     fillcolor: str = 'white'
-    position: str | None = None
-    gridposition: str | None = position
+    gridposition: str | None = None
     mode: str = "resize"
     type: TagType = TagType.MEME
 
@@ -51,8 +51,8 @@ class LPText(LPTag):
 
 @dataclass
 class LPComposite(LPTag):
-    gridsize: Any | None = None  # TODO(schorrm): fix with correct types
-    gridposition: Any | None = None  # TODO(schorrm): fix with correct type
+    gridsize: tuple[int, int] | None = None
+    gridposition: str | None = None
     type: TagType | None = TagType.COMPOSITE
 
     def __repr__(self):
