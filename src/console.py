@@ -1,14 +1,16 @@
 #!/usr/bin/python3
 
 import argparse
+import os
 
 from lark import Lark
+from PIL import Image, PngImagePlugin
+
 from .transform_parse_tree import ConvertParseTree
 from .stack_manager import StackManager
 from .utils import get_fml_memes, install_fml, update_fml, inspect_fml, view_fml
 from .image_to_clipboard import image_to_clipboard
-import os
-from PIL import Image, PngImagePlugin
+
 
 def main():
     dirname = os.path.dirname(__file__)
@@ -29,16 +31,25 @@ def main():
     parser = argparse.ArgumentParser("Standard Meme Compiler: v0.1")
 
     parser.add_argument('-s', '--string', help="Create from string")
-    parser.add_argument('-f', '--loadfile', help="Load Standard Meme Representation from file")
-    parser.add_argument('-o', '--outputfile', default="default.meme.png", help="Output filename")
-    parser.add_argument('-c', '--clipboard', action="store_true", help="Store resulting image to clipboard (Windows only)")
-    parser.add_argument('-p', '--preview', action="store_true", help="View resulting image without saving")
-    parser.add_argument('-e', '--extractinfo', help="Extract meme representation from a meme")
-    parser.add_argument('-l', '--listfml', action="store_true", help="List available FML memes")
+    parser.add_argument('-f', '--loadfile',
+                        help="Load Standard Meme Representation from file")
+    parser.add_argument('-o', '--outputfile',
+                        default="default.meme.png", help="Output filename")
+    parser.add_argument('-c', '--clipboard', action="store_true",
+                        help="Store resulting image to clipboard (Windows only)")
+    parser.add_argument('-p', '--preview', action="store_true",
+                        help="View resulting image without saving")
+    parser.add_argument('-e', '--extractinfo',
+                        help="Extract meme representation from a meme")
+    parser.add_argument('-l', '--listfml', action="store_true",
+                        help="List available FML memes")
     parser.add_argument('-v', '--view-fml', help="View an FML meme")
-    parser.add_argument('-i', '--inspectfml', help="View memeconfig for an fml meme")
-    parser.add_argument('--getfml', action="store_true", help="Install the FML (Foundational Meme Library). Requires git.")
-    parser.add_argument('--updatefml', action="store_true", help="Update the FML and make sure everything is dank and up to date. Requires git.")
+    parser.add_argument('-i', '--inspectfml',
+                        help="View memeconfig for an fml meme")
+    parser.add_argument('--getfml', action="store_true",
+                        help="Install the FML (Foundational Meme Library). Requires git.")
+    parser.add_argument('--updatefml', action="store_true",
+                        help="Update the FML and make sure everything is dank and up to date. Requires git.")
 
     args = parser.parse_args()
 
@@ -63,7 +74,6 @@ def main():
         view_fml(args.view_fml)
         exit(0)
 
-
     if args.extractinfo:
         img = Image.open(args.extractinfo)
         data = img.info.get('memesource')
@@ -81,7 +91,6 @@ def main():
     if not memestr:
         with open(args.loadfile) as f:
             memestr = f.read().strip()
-
 
     # TODO: /M:dw-sign/T:Use with caution;F::75/T:Use with caution;F::20/
     # Write the source code to the output png image in the text chunk

@@ -6,6 +6,8 @@ from .defines import TagType
 # * is /TS:style/ tag only shorthand for /F:::style/?
 # * is it toggle bitfield or overwrite?
 # * what happens if calling /END:TS/ after /F/ or vice versa? (Do we need a 4th Style object?)
+
+
 class FormatManager:
     class FormatContext:
         def __init__(self, def_font=Font(), def_align=Alignment(), def_color=Color()):
@@ -51,7 +53,8 @@ class FormatManager:
             elif tag.type == TagType.TEXTSTYLE:
                 self.TS_tag(tag)
             elif tag.type == TagType.POP:
-                warnings.warn("Got POP tag in update_context(). pop_tag() should be called explicitly", SyntaxWarning)
+                warnings.warn(
+                    "Got POP tag in update_context(). pop_tag() should be called explicitly", SyntaxWarning)
                 self.pop_tag(tag)
             else:
                 # TODO: Usefuller error messages. Own error type(s)?
@@ -59,27 +62,25 @@ class FormatManager:
 
         def pop_tag(self, tag):
             """ Handles a pop tag """
-            if tag == TagType.FONT:
-                target_array = self.fonts
-            elif tag == TagType.ALIGNMENT:
-                target_array = self.aligns
-            elif tag == TagType.COLOR:
-                target_array = self.colors
-            elif tag == TagType.TEXTSTYLE:
-                target_array = self.fonts
-            else:
-                raise RuntimeError("Invalid pop tag data")
+            match tag:
+                case TagType.FONT | TagType.TEXTSTYLE:
+                    target_array = self.fonts
+                case TagType.ALIGNMENT:
+                    target_array = self.aligns
+                case TagType.COLOR:
+                    target_array = self.colors
+                case _:
+                    raise RuntimeError("Invalid pop tag data")
 
             if len(target_array) > 1:
                 target_array.pop()
             else:
                 raise SyntaxError("Can't pop default formatting specifier")
-        
+
         def _flatten(self):
             self.fonts = [self.current_font]
             self.aligns = [self.current_align]
             self.colors = [self.current_color]
-
 
     @property
     def _current_context(self):
@@ -95,7 +96,7 @@ class FormatManager:
                                                          self.current_color))
         for tag in scoped_tags:
             self.update_context(tag)
-        
+
         self._current_context._flatten()
 
     def pop_context(self):
@@ -111,4 +112,3 @@ class FormatManager:
         context = self._current_context
         self.pop_context()
         return context
-

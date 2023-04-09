@@ -5,64 +5,64 @@ Class for intermediate layout objects
 
 from .utils import get_image_size
 from .defines import DEFAULT_SIZE, TagType
-from typing import Dict
+from typing import Any, Dict
+from dataclasses import dataclass
 
-class Pop:
-    def __init__(self, tag: TagType):
-        self.type = TagType.POP
-        self.target = tag
+
+# Represents the interface for grouping the structural objects
+class LPTag:
+    pass
+
+
+@dataclass
+class Pop(LPTag):
+    target: TagType
+    type: TagType = TagType.POP
 
     def __repr__(self):
         return f'<Pop {self.target}>'
 
 
-class LPMeme:
-    def __init__(self, image: str = None, size=None, fillcolor='white', position=None, mode="resize"):
-        self.image = image
-        self.size = size or (None, None)
-        self.fillcolor = fillcolor
-        self.gridposition = position
-        self.mode = mode
-        self.type = TagType.MEME
+@dataclass
+class LPMeme(LPTag):
+    image: str | None = None
+    # note: under the hood, `/WP:/`` adds an LPMeme with size=('lookahead', None)
+    size: tuple[int | str | None, int | None] = (None, None)
+    fillcolor: str = 'white'
+    gridposition: tuple[int, int] | None = None
+    mode: str = "resize"
+    type: TagType = TagType.MEME
 
     def __repr__(self):
         coords = f'({self.size[0]}x{self.size[1]})' if self.size else f'(?x?)'
         return f'<Meme: {self.image} {coords} @{self.gridposition}>'
 
-class LPText:
-    def __init__(self, text, position=None, rotation=0):
-        self.text = text
-        self.position = position
-        self.rotation = rotation
-        self.type = TagType.TEXT
+
+@dataclass
+class LPText(LPTag):
+    text: str
+    position: str | None = None
+    rotation: int = 0
+    type: TagType = TagType.TEXT
 
     def __repr__(self):
         return f'<Text "{self.text}" @{self.position}>'
 
-class LPComposite:
-    def __init__(self, gridsize=None, gridposition=None):
-        self.gridsize = gridsize
-        self.gridposition = gridposition
-        self.type = TagType.COMPOSITE
+
+@dataclass
+class LPComposite(LPTag):
+    gridsize: tuple[int, int] | None = None
+    gridposition: tuple[int, int] | None = None
+    type: TagType | None = TagType.COMPOSITE
 
     def __repr__(self):
         return f'<LPComposite: {self.gridsize} @{self.gridposition}>'
 
-class LPWhitespacePrefix:
-    def __init__(self, text):
-        self.text = text
-        self.type = TagType.WHITESPACE
+
+@dataclass
+class LPWhitespacePrefix(LPTag):
+    text: str
+    type: TagType = TagType.WHITESPACE
 
     def __repr__(self):
         return f'<WP: {self.text}>'
-
-# class LPOutput:
-#     def __init__(self, tagtype: TagType, data: Dict):
-#         self.type = tagtype
-#         self.data = data
-
-#     def __getattr__(self, attr):
-#         if attr in self.data.keys():
-#             return self.data[attr]
-#         else:
-#             raise ???
