@@ -126,6 +126,10 @@ class StackManager:
                 self.drawing_manager.format_manager.pop_tag(child.target)
 
         for idx in reversed(deferred):
+            # we iterate in reverse order to deal with the edge case of
+            # having consecutive lookaheads, so that we construct the
+            # second one first, preventing the first one from winding
+            # up with a size that's still ("lookahead", <something>)
             child = images[idx]
             # tuple doesn't support assignment
             child.tag.size = (images[idx+1].size[0], child.tag.size[1])
