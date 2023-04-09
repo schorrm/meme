@@ -52,7 +52,7 @@ class LPText(LPTag):
 @dataclass
 class LPComposite(LPTag):
     gridsize: tuple[int, int] | None = None
-    gridposition: str | None = None
+    gridposition: tuple[int, int] | None = None
     type: TagType | None = TagType.COMPOSITE
 
     def __repr__(self):
