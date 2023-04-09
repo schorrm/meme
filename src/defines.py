@@ -2,34 +2,37 @@
 
 import os.path
 from enum import Enum, auto, unique
- 
+
 # We were worried about too much in utils, so we now have a separation.
 # This file is meant for all the various global defaults and settings.
 
 DEFAULT_SIZE = (640, 480)
 DEFAULT_FONT_SIZE = 100
 
-OFFSET_WHITESPACE = 5 
+OFFSET_WHITESPACE = 5
 
 FML_DIR = os.path.join(os.path.expanduser("~"), '.local', 'lib', 'meme', 'fml')
-LIB_DIR = os.path.join(os.path.expanduser("~"), '.local', 'lib', 'meme', 'libs')
+LIB_DIR = os.path.join(os.path.expanduser(
+    "~"), '.local', 'lib', 'meme', 'libs')
 FML_URL = "https://github.com/schorrm/fml.git"
 
-DEFAULT_FIELD_CFG = { "RIGHT"  : ("50%",  "0%", "100%", "100%"), # r1..rn
-                      "LEFT"   : ( "0%",  "0%",  "50%", "100%"), # l1..ln
-                      "top"    : ( "0%",  "0%", "100%",  "20%"),
-                      "bottom" : ( "0%", "80%", "100%", "100%"),
-                      "center" : ( "0%", "40%", "100%",  "60%"),
-                      "rtop"   : ("50%",  "0%", "100%",  "20%"),
-                      "rbottom": ("50%", "80%", "100%", "100%"),
-                      "rcenter": ("50%", "40%", "100%",  "60%"),
-                      "ltop"   : ( "0%",  "0%",  "50%",  "20%"),
-                      "lbottom": ( "0%", "80%",  "50%", "100%"),
-                      "lcenter": ( "0%", "40%",  "50%",  "60%")
-                    }
-DEFAULT_FIELD_ORDER = ("top", "bottom", "center", "rtop", "rbottom", "rcenter", "ltop", "lbottom", "lcenter")
+DEFAULT_FIELD_CFG = {"RIGHT": ("50%",  "0%", "100%", "100%"),  # r1..rn
+                     "LEFT": ("0%",  "0%",  "50%", "100%"),  # l1..ln
+                     "top": ("0%",  "0%", "100%",  "20%"),
+                     "bottom": ("0%", "80%", "100%", "100%"),
+                     "center": ("0%", "40%", "100%",  "60%"),
+                     "rtop": ("50%",  "0%", "100%",  "20%"),
+                     "rbottom": ("50%", "80%", "100%", "100%"),
+                     "rcenter": ("50%", "40%", "100%",  "60%"),
+                     "ltop": ("0%",  "0%",  "50%",  "20%"),
+                     "lbottom": ("0%", "80%",  "50%", "100%"),
+                     "lcenter": ("0%", "40%",  "50%",  "60%")
+                     }
+DEFAULT_FIELD_ORDER = ("top", "bottom", "center", "rtop",
+                       "rbottom", "rcenter", "ltop", "lbottom", "lcenter")
 
-CONFIG_EXT = '.memeconfig' # Would still be neat to support embedding this stuff in JPEG EXIF fields / PNG Text chunks. -> later version
+# Would still be neat to support embedding this stuff in JPEG EXIF fields / PNG Text chunks. -> later version
+CONFIG_EXT = '.memeconfig'
 
 # Default formatting for WP to meme
 WP_DEFAULT_FONT = 'arial'
@@ -39,6 +42,7 @@ WP_DEFAULT_OL_SIZE = 0
 FONT_DATA = ['font_face', 'font_size', 'outline_size', 'text_style']
 ALIGN_DATA = ['halign', 'valign']
 COLOR_DATA = ['foreground', 'background', 'outline']
+
 
 @unique
 class TagType(Enum):
@@ -51,7 +55,7 @@ class TagType(Enum):
     MEME = auto()
     COMPOSITE = auto()
     WHITESPACE = auto()
-
+    TIME = auto()
 
     @property
     def is_format(self):

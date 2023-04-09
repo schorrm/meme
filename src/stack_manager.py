@@ -118,8 +118,10 @@ class StackManager:
                 else:
                     image = self.drawing_manager.DrawMeme(
                         child.tag, child.scoped_tags, child.children)
+                    if image.is_animated:
+                        return image  # only one animated gif
                     images.append(image)
-            elif child.type.is_format:
+            elif child.type.is_format or child.type == TagType.TIME:
                 self.drawing_manager.format_manager.update_context(child)
 
             elif child.type == TagType.POP and child.target.is_format:

@@ -1,11 +1,12 @@
 #!/usr/bin/python3
 
+import copy
 from lark import Lark, Transformer
 
 from .utils import unpack, unpack3, list2dict
 from .defines import TagType
 
-from .format_types import Font, Alignment, Color
+from .format_types import Font, Alignment, Color, Time
 from .layout_objects import LPMeme, LPText, LPComposite, LPWhitespacePrefix, Pop
 
 ESCAPE_CHAR = '~'
@@ -15,7 +16,6 @@ escape_map = {
     't': '\t'
 }
 
-import copy
 
 def _extract_monic(tree):
     if tree:
@@ -100,7 +100,7 @@ class ConvertParseTree(Transformer):
         processed_text = ''
         escape = False
         for char in text:
-            if escape: # previous char was escaped
+            if escape:  # previous char was escaped
                 processed_text += escape_map.get(char, char)
                 escape = False
             elif char == ESCAPE_CHAR:
@@ -134,3 +134,29 @@ class ConvertParseTree(Transformer):
 
     def whitespaceprefix(self, text):
         return LPWhitespacePrefix(**text[0])
+
+    def time(self, tree):
+        tree = list2dict(tree)
+        return Time(**tree)
+
+    def secondsdirective(self, tree):
+        return {'seconds': tree[0]}
+
+    def framesdirective(self, bounds):
+        bounds = [int(b) if b is not None else None for b in bounds[0]]
+        return {'frames': bounds}
+
+    def range(self, tree):
+        return tree[0]
+
+    def closed(self, bounds):
+        upper, lower = bounds
+        return (float(upper), float(lower))
+
+    def at_least(self, min):
+        min = _extract_monic(min)
+        return (float(min), None)
+
+    def less_than(self, max):
+        max = _extract_monic(max)
+        return (None, float(max))

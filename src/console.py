@@ -4,7 +4,7 @@ import argparse
 import os
 
 from lark import Lark
-from PIL import Image, PngImagePlugin
+from PIL import Image, PngImagePlugin, GifImagePlugin
 
 from .transform_parse_tree import ConvertParseTree
 from .stack_manager import StackManager
@@ -13,6 +13,7 @@ from .image_to_clipboard import image_to_clipboard
 
 
 def main():
+    GifImagePlugin.LOADING_STRATEGY = GifImagePlugin.LoadingStrategy.RGB_ALWAYS
     dirname = os.path.dirname(__file__)
     filename = os.path.join(dirname, 'grammar_enforcing.lark')
 
@@ -102,6 +103,14 @@ def main():
 
     elif args.preview:
         img.show()
+
+    elif img.is_animated:
+        filename = os.path.join(os.getcwd(), args.outputfile)
+        if filename.endswith('.png'):
+            filename = filename.removesuffix('.png') + '.gif'
+        info = img.info
+        info['comment'] = f'memesource: {memestr}'
+        img.save(filename, save_all=True)
 
     else:
         filename = os.path.join(os.getcwd(), args.outputfile)

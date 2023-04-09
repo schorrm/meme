@@ -3,7 +3,7 @@
 Class for intermediate layout objects
 '''
 
-from .utils import get_image_size
+from .utils import get_image_size, BBox
 from .defines import DEFAULT_SIZE, TagType
 from typing import Any, Dict
 from dataclasses import dataclass
@@ -44,6 +44,7 @@ class LPText(LPTag):
     position: str | None = None
     rotation: int = 0
     type: TagType = TagType.TEXT
+    resolved_position: None | BBox = None
 
     def __repr__(self):
         return f'<Text "{self.text}" @{self.position}>'
