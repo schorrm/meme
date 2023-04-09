@@ -29,7 +29,7 @@ class LPMeme(LPTag):
     # note: under the hood, `/WP:/`` adds an LPMeme with size=('lookahead', None)
     size: tuple[int | str | None, int | None] = (None, None)
     fillcolor: str = 'white'
-    gridposition: str | None = None
+    gridposition: tuple[int, int] | None = None
     mode: str = "resize"
     type: TagType = TagType.MEME
 
