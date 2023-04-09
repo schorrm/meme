@@ -11,18 +11,6 @@ from PIL import Image, ImageDraw
 from math import ceil
 
 
-def is_layout_obj(obj) -> bool:
-    return type(obj) in [LPMeme, LPComposite, LPText, LPWhitespacePrefix]
-
-
-# def get_grid_position(obj) -> Any | None:
-#     match obj:
-#         case LPComposite():
-#             return obj.gridposition
-#         case _:
-#             return None
-
-
 class Scope:
     def __init__(self, tag, scoped_tags=None):
         self.tag = tag
@@ -93,6 +81,7 @@ class StackManager:
                     self.current_scope.children.append(
                         Scope(tag, scoped_tags))
                 case LPWhitespacePrefix():
+                    # TODO: Figure out dependencies between auto and lookahead and also actually program them in somewhere (here vs backend?)
                     self.add_scope(LPMeme(image=None, size=(
                         "lookahead", None), fillcolor='white'), list())
                     self.current_scope.children.append(Scope(LPText(tag.text, position='all'), [Alignment("left", "top"), Font(
@@ -163,7 +152,7 @@ class StackManager:
         grid = [[None]*rows for _ in range(cols)]
         for i in range(len(images)):
             c, r = scope.children[i].tag.gridposition or idx2pair(
-                next_gridposition)  # TODO: check order of r, c
+                next_gridposition)
             next_gridposition = pair2idx(c, r)+1
             grid[c][r] = {"image": images[i], "tag": scope.children[i].tag}
 
